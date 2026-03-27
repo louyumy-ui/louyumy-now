@@ -1,0 +1,85 @@
+import React from 'react';
+
+export type Carrier = '中国移动' | '中国联通' | '中国电信' | '虚拟运营商';
+
+export type NumberStatus = 'active' | 'cooldown' | 'suspended';
+
+export interface PhoneNumber {
+  id: string;
+  number: string; // 完整号码 (区号+座机)
+  areaCode: string; // 区号
+  landlineNumber: string; // 座机号
+  carrier: Carrier;
+  province: string;
+  city: string;
+  usageCount: number;
+  successRate: number;
+  status: NumberStatus;
+  isHarassed: boolean; // 骚扰标记
+  selected: boolean;
+  lastUsed: string;
+  isDisplay: boolean; // 是否外显
+  isEnabled: boolean; // 启用/停用状态
+  remark: string; // 备注
+  assignedAgentIds: string[]; // 关联坐席ID列表
+  assignedScriptId?: number; // 关联话术ID
+  lineGroupId?: string; // 所属线路组ID
+}
+
+export interface Agent {
+  id: string;
+  name: string;
+  account: string;
+  associatedAccounts: string[]; // 关联的多个账号列表
+  status: 'online' | 'offline' | 'busy';
+  isEnabled: boolean; // 账号启用状态
+  assignedNumbers: string[]; // 关联的号码ID列表
+  assignedScriptIds: number[]; // 关联的话术ID列表
+  lineGroupId?: string; // 关联线路组/号码池
+  targetProvince?: string; // 目标外呼省份 (用于地域优先分配)
+  concurrency: number; // 并发数量
+  lastLogin?: string; // 最后登录时间
+  remark: string; // 备注
+}
+
+export interface CarrierConfig {
+  id: string;
+  name: string;
+  status: 'active' | 'inactive';
+}
+
+export interface RegionConfig {
+  id: string;
+  province: string;
+  cities: string[];
+}
+
+export interface Filters {
+  carrier: string;
+  province: string;
+  city: string;
+  search: string;
+  frequency?: 'all' | 'low' | 'high';
+  displayStatus: 'all' | 'on' | 'off'; // 外显状态：开启/关闭/全部
+  enableStatus: 'all' | 'enabled' | 'disabled'; // 启用状态：启用/停用/全部
+  viewStatus: 'all' | 'cooldown' | 'suspended' | 'no_display' | 'has_display'; // 综合视图筛选
+}
+
+export interface LineGroup {
+  id: string;
+  name: string;
+  areaCode: string;
+  totalConcurrency: number;
+  assignedConcurrency: number;
+  remainingConcurrency: number;
+  status: 'enabled' | 'disabled';
+  createdAt: string;
+  carriers: Carrier[];
+}
+
+export interface TabItem {
+  id: string;
+  label: string;
+  icon?: React.ElementType;
+  closable?: boolean;
+}
