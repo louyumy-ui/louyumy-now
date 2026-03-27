@@ -16,7 +16,8 @@ const AddAgentModal: React.FC<AddAgentModalProps> = ({ isOpen, onClose, availabl
   const [name, setName] = useState('');
   const [account, setAccount] = useState('');
   const [remark, setRemark] = useState('');
-  const [concurrency, setConcurrency] = useState(5);
+  const [seatConcurrency, setSeatConcurrency] = useState(5);
+  const [accountConcurrency, setAccountConcurrency] = useState(10);
   const [isEnabled, setIsEnabled] = useState(true);
   const [selectedNumbers, setSelectedNumbers] = useState<string[]>([]);
   const [smartCount, setSmartCount] = useState<number>(0);
@@ -29,7 +30,8 @@ const AddAgentModal: React.FC<AddAgentModalProps> = ({ isOpen, onClose, availabl
       setName(editAgent.name);
       setAccount(editAgent.account);
       setRemark(editAgent.remark || '');
-      setConcurrency(editAgent.concurrency);
+      setSeatConcurrency(editAgent.seatConcurrency);
+      setAccountConcurrency(editAgent.accountConcurrency);
       setIsEnabled(editAgent.isEnabled);
       // 匹配号码ID
       const matchedIds = availableNumbers
@@ -41,7 +43,8 @@ const AddAgentModal: React.FC<AddAgentModalProps> = ({ isOpen, onClose, availabl
       setName('');
       setAccount('');
       setRemark('');
-      setConcurrency(5);
+      setSeatConcurrency(5);
+      setAccountConcurrency(10);
       setIsEnabled(true);
       setSelectedNumbers([]);
       setSmartCount(0);
@@ -102,7 +105,15 @@ const AddAgentModal: React.FC<AddAgentModalProps> = ({ isOpen, onClose, availabl
     const numberStrings = availableNumbers
       .filter(n => selectedNumbers.includes(n.id))
       .map(n => n.number);
-    onAdd({ name, account, selectedNumbers: numberStrings, remark, concurrency, isEnabled });
+    onAdd({ 
+      name, 
+      account, 
+      selectedNumbers: numberStrings, 
+      remark, 
+      seatConcurrency, 
+      accountConcurrency,
+      isEnabled 
+    });
     setStep(2);
   };
 
@@ -164,14 +175,25 @@ const AddAgentModal: React.FC<AddAgentModalProps> = ({ isOpen, onClose, availabl
                   </button>
                 </div>
               </div>
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">并发限制</label>
-                <input 
-                  type="number" 
-                  value={concurrency}
-                  onChange={(e) => setConcurrency(parseInt(e.target.value) || 0)}
-                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-ant-blue/20 outline-none"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">坐席业务并发</label>
+                  <input 
+                    type="number" 
+                    value={seatConcurrency}
+                    onChange={(e) => setSeatConcurrency(parseInt(e.target.value) || 0)}
+                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-ant-blue/20 outline-none"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">账号最大并发</label>
+                  <input 
+                    type="number" 
+                    value={accountConcurrency}
+                    onChange={(e) => setAccountConcurrency(parseInt(e.target.value) || 0)}
+                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-ant-blue/20 outline-none"
+                  />
+                </div>
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">备注</label>

@@ -8,10 +8,10 @@ const AgentManagement: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editAgent, setEditAgent] = useState<Agent | null>(null);
   const [agents, setAgents] = useState<Agent[]>([
-    { id: '1', name: '张三', account: 'agent_001', status: 'online', concurrency: 5, isEnabled: true, lastLogin: '2024-03-16 14:30', assignedNumbers: ['020-13800138000', '010-18612345678'], associatedAccounts: [], assignedScriptIds: [], remark: '资深坐席' },
-    { id: '2', name: '李四', account: 'agent_002', status: 'busy', concurrency: 3, isEnabled: true, lastLogin: '2024-03-16 15:45', assignedNumbers: ['021-13399887766'], associatedAccounts: [], assignedScriptIds: [], remark: '新入职' },
-    { id: '3', name: '王五', account: 'agent_003', status: 'offline', concurrency: 10, isEnabled: false, lastLogin: '2024-03-15 09:15', assignedNumbers: [], associatedAccounts: [], assignedScriptIds: [], remark: '待岗' },
-    { id: '4', name: '赵六', account: 'agent_004', status: 'online', concurrency: 8, isEnabled: true, lastLogin: '2024-03-16 16:20', assignedNumbers: ['025-13912345678'], associatedAccounts: [], assignedScriptIds: [], remark: '外呼冠军' },
+    { id: '1', name: '张三', account: 'agent_001', status: 'online', seatConcurrency: 5, accountConcurrency: 10, isEnabled: true, lastLogin: '2024-03-16 14:30', assignedNumbers: ['020-13800138000', '010-18612345678'], associatedAccounts: [], assignedScriptIds: [], remark: '资深坐席', targetProvince: '广东' },
+    { id: '2', name: '李四', account: 'agent_002', status: 'busy', seatConcurrency: 3, accountConcurrency: 8, isEnabled: true, lastLogin: '2024-03-16 15:45', assignedNumbers: ['021-13399887766'], associatedAccounts: [], assignedScriptIds: [], remark: '新入职', targetProvince: '北京' },
+    { id: '3', name: '王五', account: 'agent_003', status: 'offline', seatConcurrency: 10, accountConcurrency: 20, isEnabled: false, lastLogin: '2024-03-15 09:15', assignedNumbers: [], associatedAccounts: [], assignedScriptIds: [], remark: '待岗', targetProvince: '上海' },
+    { id: '4', name: '赵六', account: 'agent_004', status: 'online', seatConcurrency: 8, accountConcurrency: 15, isEnabled: true, lastLogin: '2024-03-16 16:20', assignedNumbers: ['025-13912345678'], associatedAccounts: [], assignedScriptIds: [], remark: '外呼冠军', targetProvince: '广东' },
   ]);
 
   const getStatusBadge = (status: Agent['status']) => {
@@ -29,6 +29,12 @@ const AgentManagement: React.FC = () => {
   const handleEdit = (agent: Agent) => {
     setEditAgent(agent);
     setIsAddModalOpen(true);
+  };
+
+  const handleDelete = (id: string) => {
+    if (window.confirm('确定要删除该坐席吗？')) {
+      setAgents(prev => prev.filter(a => a.id !== id));
+    }
   };
 
   const handleAdd = () => {
@@ -87,7 +93,8 @@ const AgentManagement: React.FC = () => {
             <thead>
               <tr className="bg-gray-50/50 text-gray-500 text-xs uppercase tracking-wider font-semibold">
                 <th className="px-6 py-4 border-b border-gray-100">坐席信息</th>
-                <th className="px-6 py-4 border-b border-gray-100">并发限制</th>
+                <th className="px-6 py-4 border-b border-gray-100">坐席业务并发</th>
+                <th className="px-6 py-4 border-b border-gray-100">账号最大并发</th>
                 <th className="px-6 py-4 border-b border-gray-100">号码池/线路组</th>
                 <th className="px-6 py-4 border-b border-gray-100">关联账号/话术</th>
                 <th className="px-6 py-4 border-b border-gray-100">启用状态</th>
@@ -110,20 +117,37 @@ const AgentManagement: React.FC = () => {
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-900">{agent.name}</div>
-                        <div className="text-[11px] text-gray-400 font-mono">{agent.account}</div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] text-gray-400 font-mono">{agent.account}</span>
+                          <span className="text-[10px] bg-gray-100 px-1.5 py-0.5 rounded text-gray-500 font-bold">{agent.targetProvince}</span>
+                        </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center justify-between w-24">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase">Concurrency</span>
-                        <span className="text-xs font-bold text-ant-blue">{agent.concurrency}</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Seat CPS</span>
+                        <span className="text-xs font-bold text-ant-blue">{agent.seatConcurrency}</span>
                       </div>
                       <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                         <div 
                           className="h-full bg-ant-blue rounded-full" 
-                          style={{ width: `${(agent.concurrency / 10) * 100}%` }}
+                          style={{ width: `${(agent.seatConcurrency / 15) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center justify-between w-24">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Account Max</span>
+                        <span className="text-xs font-bold text-indigo-600">{agent.accountConcurrency}</span>
+                      </div>
+                      <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-indigo-500 rounded-full" 
+                          style={{ width: `${(agent.accountConcurrency / 30) * 100}%` }}
                         />
                       </div>
                     </div>
@@ -177,15 +201,17 @@ const AgentManagement: React.FC = () => {
                     <div className="flex items-center justify-end gap-2">
                       <button 
                         onClick={() => handleEdit(agent)}
-                        className="p-1.5 text-gray-400 hover:text-ant-blue hover:bg-blue-50 rounded-md transition-all"
+                        className="flex items-center gap-1 px-3 py-1.5 text-ant-blue bg-blue-50 hover:bg-blue-100 rounded-lg transition-all text-xs font-bold"
                       >
                         <Edit size={14} />
+                        <span>编辑</span>
                       </button>
-                      <button className="p-1.5 text-gray-400 hover:text-rose-500 hover:bg-rose-50 rounded-md transition-all">
+                      <button 
+                        onClick={() => handleDelete(agent.id)}
+                        className="flex items-center gap-1 px-3 py-1.5 text-rose-500 bg-rose-50 hover:bg-rose-100 rounded-lg transition-all text-xs font-bold"
+                      >
                         <Trash2 size={14} />
-                      </button>
-                      <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-all">
-                        <MoreHorizontal size={14} />
+                        <span>删除</span>
                       </button>
                     </div>
                   </td>
@@ -230,12 +256,14 @@ const AgentManagement: React.FC = () => {
               name: data.name,
               account: data.account,
               status: 'offline',
-              concurrency: 5,
-              isEnabled: true,
+              seatConcurrency: data.seatConcurrency,
+              accountConcurrency: data.accountConcurrency,
+              isEnabled: data.isEnabled,
               assignedNumbers: data.selectedNumbers,
               associatedAccounts: ['主账号'],
               assignedScriptIds: [1, 2],
-              remark: data.remark || '新创建坐席'
+              remark: data.remark || '新创建坐席',
+              targetProvince: '广东'
             };
             setAgents(prev => [...prev, newAgent]);
           }

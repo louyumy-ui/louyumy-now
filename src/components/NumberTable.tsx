@@ -4,6 +4,7 @@ import { Search, RotateCcw, Filter, MoreHorizontal, Edit, Trash2, ExternalLink, 
 import { PhoneNumber, Carrier } from '../types';
 import AssignNumbersModal from './AssignNumbersModal';
 import AddNumberModal from './AddNumberModal';
+import { RiskControlModal } from './RiskControlModal';
 
 // 自定义内联 Switch 组件 (胶囊样式)
 const CustomSwitch: React.FC<{ checked: boolean; onChange: () => void; label?: string }> = ({ checked, onChange }) => {
@@ -26,6 +27,8 @@ const CustomSwitch: React.FC<{ checked: boolean; onChange: () => void; label?: s
 const NumberTable: React.FC = () => {
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isRiskModalOpen, setIsRiskModalOpen] = useState(false);
+  const [riskAction, setRiskAction] = useState<{ id: string; number: string; type: 'disable' | 'harassment' } | null>(null);
   const [editNumber, setEditNumber] = useState<PhoneNumber | null>(null);
   const [filterCarrier, setFilterCarrier] = useState<string>('全部');
   const [filterEnable, setFilterEnable] = useState<'all' | 'enabled' | 'disabled'>('all');
@@ -68,6 +71,29 @@ const NumberTable: React.FC = () => {
 
   const toggleDisplay = (id: string) => {
     setNumbers(prev => prev.map(n => n.id === id ? { ...n, isDisplay: !n.isDisplay } : n));
+  };
+
+  const handleRiskAction = (id: string, number: string, type: 'disable' | 'harassment') => {
+    setRiskAction({ id, number, type });
+    setIsRiskModalOpen(true);
+  };
+
+  const confirmRiskAction = (reason: string) => {
+    if (!riskAction) return;
+    
+    setNumbers(prev => prev.map(n => {
+      if (n.id === riskAction.id) {
+        return {
+          ...n,
+          isEnabled: riskAction.type === 'disable' ? false : n.isEnabled,
+          isHarassed: riskAction.type === 'harassment' ? true : n.isHarassed,
+          status: 'suspended',
+          remark: `[风控下线] 原因: ${reason}`
+        };
+      }
+      return n;
+    }));
+    setRiskAction(null);
   };
 
   const getCarrierColor = (carrier: Carrier) => {
@@ -308,10 +334,12 @@ const NumberTable: React.FC = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <CustomSwitch checked={num.isEnabled} onChange={() => setNumbers(prev => prev.map(n => n.id === num.id ? { ...n, isEnabled: !n.isEnabled } : n))} />
-                      <span className={`text-xs font-medium ${num.isEnabled ? 'text-emerald-500' : 'text-rose-500'}`}>
-                        {num.isEnabled ? '启用' : '停用'}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <div className={`w-2 h-2 rounded-full ${num.isEnabled ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]' : 'bg-rose-500'}`} />
+                        <span className={`text-xs font-bold ${num.isEnabled ? 'text-emerald-600' : 'text-rose-600'}`}>
+                          {num.isEnabled ? '启用中' : '已停用'}
+                        </span>
+                      </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
@@ -323,10 +351,17 @@ const NumberTable: React.FC = () => {
                     <div className="flex items-center justify-end gap-1">
                       <button 
                         title="标记骚扰下线"
-                        onClick={() => setNumbers(prev => prev.map(n => n.id === num.id ? { ...n, isHarassed: true, isEnabled: false } : n))}
+                        onClick={() => handleRiskAction(num.id, num.number, 'harassment')}
                         className="p-1.5 text-gray-400 hover:text-rose-500 hover:bg-rose-50 rounded-md transition-colors"
                       >
                         <ShieldX size={16} />
+                      </button>
+                      <button 
+                        title="停用号码"
+                        onClick={() => handleRiskAction(num.id, num.number, 'disable')}
+                        className="p-1.5 text-gray-400 hover:text-amber-500 hover:bg-amber-50 rounded-md transition-colors"
+                      >
+                        <Ban size={16} />
                       </button>
                       <button 
                         onClick={() => handleEdit(num)}
@@ -336,9 +371,6 @@ const NumberTable: React.FC = () => {
                       </button>
                       <button className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors">
                         <Trash2 size={16} />
-                      </button>
-                      <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors">
-                        <MoreHorizontal size={16} />
                       </button>
                     </div>
                   </td>
@@ -378,6 +410,15 @@ const NumberTable: React.FC = () => {
               setNumbers(prev => [...newNums, ...prev]);
             }
           }}
+        />
+
+        <RiskControlModal
+          isOpen={isRiskModalOpen}
+          onClose={() => setIsRiskModalOpen(false)}
+          onConfirm={confirmRiskAction}
+          title={riskAction?.type === 'harassment' ? '标记骚扰下线' : '停用号码'}
+          targetNumber={riskAction?.number || ''}
+          actionType={riskAction?.type || 'disable'}
         />
       </div>
     </div>

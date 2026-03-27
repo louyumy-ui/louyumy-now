@@ -1,18 +1,54 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, UserCheck, MapPin, Zap, Info, CheckCircle2 } from 'lucide-react';
+import { X, UserCheck, MapPin, Zap, Info, CheckCircle2, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface AssignNumbersModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedCount: number;
+  selectedProvinces: string[]; // 新增：所选号码的省份列表
 }
 
-const AssignNumbersModal: React.FC<AssignNumbersModalProps> = ({ isOpen, onClose, selectedCount }) => {
+const AssignNumbersModal: React.FC<AssignNumbersModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  selectedCount,
+  selectedProvinces 
+}) => {
   const [step, setStep] = useState(1);
   const [priorityLocal, setPriorityLocal] = useState(true);
+  const [selectedAgent, setSelectedAgent] = useState<{ name: string, province: string } | null>(null);
+
+  const agents = [
+    { name: '销售一部', province: '广东' },
+    { name: '销售二部', province: '北京' },
+    { name: '张三', province: '广东' },
+    { name: '李四', province: '上海' },
+  ];
 
   if (!isOpen) return null;
+
+  const handleConfirm = () => {
+    if (!selectedAgent) {
+      toast.error('请先选择目标坐席/部门');
+      return;
+    }
+
+    // 跨地域拦截模拟逻辑
+    const invalidProvinces = selectedProvinces.filter(p => p !== selectedAgent.province);
+    
+    if (invalidProvinces.length > 0) {
+      const firstInvalid = invalidProvinces[0];
+      toast.error(`分配失败：触发风控拦截，当前系统禁止跨地域分配坐席（号码：${firstInvalid}省，坐席：${selectedAgent.province}省）`, {
+        duration: 5000,
+        icon: <AlertCircle className="text-rose-500" />
+      });
+      return; // 阻止弹窗关闭和进入下一步
+    }
+
+    setStep(2);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
@@ -48,9 +84,20 @@ const AssignNumbersModal: React.FC<AssignNumbersModalProps> = ({ isOpen, onClose
                 <div className="space-y-4">
                   <label className="block text-sm font-bold text-gray-700">选择目标坐席/部门</label>
                   <div className="grid grid-cols-2 gap-3">
-                    {['销售一部', '销售二部', '张三', '李四'].map((item) => (
-                      <button key={item} className="px-4 py-3 border border-gray-200 rounded-xl text-left hover:border-ant-blue hover:bg-blue-50/50 transition-all group">
-                        <div className="text-sm font-bold text-gray-900 group-hover:text-ant-blue">{item}</div>
+                    {agents.map((agent) => (
+                      <button 
+                        key={agent.name} 
+                        onClick={() => setSelectedAgent(agent)}
+                        className={`px-4 py-3 border rounded-xl text-left transition-all group ${
+                          selectedAgent?.name === agent.name 
+                            ? 'border-ant-blue bg-blue-50 ring-2 ring-ant-blue/20' 
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <div className={`text-sm font-bold ${selectedAgent?.name === agent.name ? 'text-ant-blue' : 'text-gray-900 group-hover:text-ant-blue'}`}>{agent.name}</div>
+                          <div className="text-[10px] bg-gray-100 px-1.5 py-0.5 rounded text-gray-500">{agent.province}</div>
+                        </div>
                         <div className="text-[10px] text-gray-400">当前负载: 65%</div>
                       </button>
                     ))}
@@ -102,7 +149,7 @@ const AssignNumbersModal: React.FC<AssignNumbersModalProps> = ({ isOpen, onClose
                 </div>
                 <h4 className="text-lg font-bold text-gray-900 mb-2">分配成功</h4>
                 <p className="text-sm text-gray-500 max-w-xs">
-                  已成功将 {selectedCount} 个号码分配至目标坐席。系统将自动根据归属地优先规则进行呼叫调度。
+                  已成功将 {selectedCount} 个号码分配至 {selectedAgent?.name}。系统将自动根据归属地优先规则进行呼叫调度。
                 </p>
               </motion.div>
             )}
@@ -118,7 +165,7 @@ const AssignNumbersModal: React.FC<AssignNumbersModalProps> = ({ isOpen, onClose
           <div className="flex gap-3">
             <button onClick={onClose} className="px-4 py-2 text-sm font-bold text-gray-500 hover:text-gray-700">取消</button>
             <button 
-              onClick={() => step === 1 ? setStep(2) : onClose()}
+              onClick={() => step === 1 ? handleConfirm() : onClose()}
               className="px-6 py-2 bg-ant-blue text-white text-sm font-bold rounded-lg hover:bg-blue-600 shadow-lg shadow-blue-200 transition-all"
             >
               {step === 1 ? '确认分配' : '完成'}
