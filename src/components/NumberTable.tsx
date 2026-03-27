@@ -396,7 +396,6 @@ const NumberTable: React.FC = () => {
         <AssignNumbersModal 
           isOpen={isAssignModalOpen} 
           onClose={() => setIsAssignModalOpen(false)} 
-          selectedCount={selectedCount} 
         />
 
         <AddNumberModal 

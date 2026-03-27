@@ -34,13 +34,33 @@ export interface PhoneNumber {
 }
 
 /**
- * AI 算力资源接口
+ * AI 引擎算力资源接口
  */
-export interface AIResource {
+export interface AIEngineResource {
+  engineType: '声音克隆' | '通用TTS'; // 引擎类型 (新增)
   totalConcurrent: number; // 总并发
   usedConcurrent: number; // 已用并发
+  dynamicLimit: number; // 动态上限 (新增)
   remainingDuration: number; // 剩余可用时长 (分钟)
   predictExhaustTime: string; // 预计耗尽时间 (如: "2小时15分钟")
+}
+
+/**
+ * 运营商合规监控接口 (新增)
+ */
+export interface TelecomCompliance {
+  currentCPS: number;
+  maxCPS: number; // 上限 30
+  dailyCallVolume: number;
+  dailyLimit: number; // 日限额 5万
+}
+
+/**
+ * 动态并发池接口 (新增)
+ */
+export interface ConcurrencyPool {
+  totalDynamicPool: number;
+  availableDynamic: number;
 }
 
 export interface Agent {
