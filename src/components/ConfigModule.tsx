@@ -52,24 +52,56 @@ const ConfigModule: React.FC<Props> = ({ config, setConfig }) => {
           </div>
           
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-2xl">
-              <span className="text-sm font-medium text-[#4B5563]">连续短通话次数 (≤3秒)</span>
-              <input 
-                type="number" 
-                value={config.coolingRule.shortCalls}
-                onChange={(e) => setConfig(prev => ({ ...prev, coolingRule: { ...prev.coolingRule, shortCalls: parseInt(e.target.value) } }))}
-                className="w-20 px-3 py-1.5 bg-white border border-[#E5E7EB] rounded-lg text-center font-bold focus:ring-2 focus:ring-[#0066FF]/20"
-              />
+            <div className="p-4 bg-orange-50 rounded-2xl border border-orange-100 flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-bold text-orange-800 flex items-center gap-1">
+                  <AlertTriangle className="w-3 h-3" />
+                  拒接监控
+                </span>
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="number" 
+                    value={config.coolingRule.rejectionWindow}
+                    onChange={(e) => setConfig(prev => ({ ...prev, coolingRule: { ...prev.coolingRule, rejectionWindow: parseInt(e.target.value) } }))}
+                    className="w-14 px-2 py-1 bg-white border border-orange-200 rounded-lg text-center text-xs font-bold"
+                  />
+                  <span className="text-xs text-orange-700">小时内，累计超过</span>
+                  <input 
+                    type="number" 
+                    value={config.coolingRule.rejectionLimit}
+                    onChange={(e) => setConfig(prev => ({ ...prev, coolingRule: { ...prev.coolingRule, rejectionLimit: parseInt(e.target.value) } }))}
+                    className="w-14 px-2 py-1 bg-white border border-orange-200 rounded-lg text-center text-xs font-bold"
+                  />
+                  <span className="text-xs text-orange-700">次</span>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-2xl">
-              <span className="text-sm font-medium text-[#4B5563]">连续拒接次数</span>
-              <input 
-                type="number" 
-                value={config.coolingRule.rejections}
-                onChange={(e) => setConfig(prev => ({ ...prev, coolingRule: { ...prev.coolingRule, rejections: parseInt(e.target.value) } }))}
-                className="w-20 px-3 py-1.5 bg-white border border-[#E5E7EB] rounded-lg text-center font-bold focus:ring-2 focus:ring-[#0066FF]/20"
-              />
+
+            <div className="p-4 bg-orange-50 rounded-2xl border border-orange-100 flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-bold text-orange-800 flex items-center gap-1">
+                  <Cpu className="w-3 h-3" />
+                  短通话监控 (≤{config.coolingRule.shortCallDuration}s)
+                </span>
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="number" 
+                    value={config.coolingRule.shortCallWindow}
+                    onChange={(e) => setConfig(prev => ({ ...prev, coolingRule: { ...prev.coolingRule, shortCallWindow: parseInt(e.target.value) } }))}
+                    className="w-14 px-2 py-1 bg-white border border-orange-200 rounded-lg text-center text-xs font-bold"
+                  />
+                  <span className="text-xs text-orange-700">小时内，累计超过</span>
+                  <input 
+                    type="number" 
+                    value={config.coolingRule.shortCallCountLimit}
+                    onChange={(e) => setConfig(prev => ({ ...prev, coolingRule: { ...prev.coolingRule, shortCallCountLimit: parseInt(e.target.value) } }))}
+                    className="w-14 px-2 py-1 bg-white border border-orange-200 rounded-lg text-center text-xs font-bold"
+                  />
+                  <span className="text-xs text-orange-700">通</span>
+                </div>
+              </div>
             </div>
+
             <div className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-2xl">
               <span className="text-sm font-medium text-[#4B5563]">冷却时长 (小时)</span>
               <input 
@@ -192,6 +224,18 @@ const ConfigModule: React.FC<Props> = ({ config, setConfig }) => {
               >
                 <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${config.autoReplenishDisabled ? 'left-7' : 'left-1'}`}></div>
               </button>
+            </div>
+            <div className="flex items-center justify-between p-4 bg-red-50 rounded-2xl border border-red-100">
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-red-800">24小时自动补号上限 (次)</span>
+                <span className="text-[10px] text-red-600 font-medium">每坐席/业务线今日补号次数红线</span>
+              </div>
+              <input 
+                type="number" 
+                value={config.replenishLimit24h}
+                onChange={(e) => setConfig(prev => ({ ...prev, replenishLimit24h: parseInt(e.target.value) || 0 }))}
+                className="w-20 px-3 py-1.5 bg-white border border-red-200 rounded-lg text-center font-bold text-red-800"
+              />
             </div>
           </div>
         </div>

@@ -1,9 +1,17 @@
 export type LineStatus = 'enabled' | 'disabled';
-export type NumberStatus = 'normal' | 'cooling' | 'disabled';
+export type AgentStatus = 'enabled' | 'disabled' | 'archived';
+export type NumberStatus = 'normal' | 'cooling' | 'disabled' | 'suspended_with_agent';
 export type DisplayStatus = 'active' | 'inactive';
+
+export interface Operator {
+  id: string;
+  name: string;
+  remark: string;
+}
 
 export interface LineGroup {
   id: string;
+  province: string;
   city: string;
   operator: string;
   areaCode: string;
@@ -22,35 +30,70 @@ export interface PhoneNumber {
   number: string;
   lineGroupId: string;
   operator: string;
-  city: string;
   dailyCalls: number;
-  createdAt: string;
-  status: NumberStatus;
+  totalCalls: number;
   displayStatus: DisplayStatus;
+  status: NumberStatus;
   agentId?: string;
-  remark: string;
-  coolingStartTime?: string;
+  businessType: string;
   coolingReason?: string;
+  createdAt?: string;
+  remark?: string;
+  coolingStartTime?: string;
 }
 
 export interface Agent {
   id: string;
   name: string;
-  city: string;
   operator: string;
+  lineGroupId: string;
   numberCount: number;
-  boundNumbers: string[]; // IDs of numbers
-  concurrency: number;
-  accountId: string;
-  status: LineStatus;
+  availableNumberCount: number;
+  concurrencyLimit: number;
+  associatedAccounts: string[]; // List of account names or IDs
+  associatedScripts: string[]; // List of script names or IDs
+  status: AgentStatus;
   remark: string;
+  selectionMode?: 'auto' | 'manual';
+  selectedNumbers?: string[];
+}
+
+export interface AIResourceStats {
+  globalPurchase: number;
+  fixedGuarantee: number;
+  dynamicQuota: number;
+  realtimeOccupancy: number;
+  mandarin: {
+    globalPurchase: number;
+    fixedGuarantee: number;
+    dynamicQuota: number;
+    realtimeOccupancy: number;
+  };
+  cantonese: {
+    globalPurchase: number;
+    fixedGuarantee: number;
+    dynamicQuota: number;
+    realtimeOccupancy: number;
+  };
+}
+
+export interface AIResourceAllocation {
+  id: string;
+  name: string;
+  type: 'fixed' | 'dynamic';
+  language: 'mandarin' | 'cantonese';
+  limit: number;
+  occupancy: number;
+  status: 'active' | 'warning' | 'error';
 }
 
 export interface GlobalConfig {
   coolingRule: {
-    shortCalls: number; // e.g., 5
+    rejectionLimit: number; // e.g., 10
+    rejectionWindow: number; // in hours, e.g., 1
     shortCallDuration: number; // e.g., 3 seconds
-    rejections: number; // e.g., 10
+    shortCallCountLimit: number; // e.g., 5
+    shortCallWindow: number; // in hours, e.g., 1
     coolingHours: number; // e.g., 2
   };
   concurrencyRule: {
@@ -63,4 +106,5 @@ export interface GlobalConfig {
   };
   autoReplenishCooling: boolean;
   autoReplenishDisabled: boolean;
+  replenishLimit24h: number; // Max replenishment per day
 }
