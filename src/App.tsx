@@ -103,11 +103,11 @@ const App: React.FC = () => {
   };
 
   const tabs = [
-    { id: 'dashboard', label: '全局总览看板', icon: BarChart3 },
-    { id: 'resources', label: '资源管理', icon: Globe },
-    { id: 'concurrency', label: '并发管理', icon: Zap },
+    { id: 'dashboard', label: '看板总览', icon: BarChart3 },
     { id: 'enterprises', label: '企业管理', icon: Briefcase },
-    { id: 'agents', label: '坐席/话术管理', icon: Users },
+    { id: 'resources', label: '资源管理', icon: Globe },
+    { id: 'agents', label: '坐席管理', icon: Users },
+    { id: 'concurrency', label: '并发管理', icon: Zap },
     { id: 'config', label: '系统规则配置', icon: Settings },
   ];
 
@@ -199,9 +199,8 @@ const App: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-6">
-            <div className="relative p-3 bg-white rounded-2xl border shadow-sm cursor-pointer hover:shadow-md transition-all">
-              <Bell className="w-5 h-5 text-[#A3AED0]" />
-              <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-[#EE5D50] rounded-full border-2 border-white"></span>
+            <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+              Production Environment / Standard Mode
             </div>
           </div>
         </header>

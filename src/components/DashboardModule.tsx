@@ -1,13 +1,5 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { 
-  Activity, 
-  Database, 
-  Zap, 
-  Users, 
-  AlertCircle,
-  Server
-} from 'lucide-react';
 import { cn } from '../lib/utils';
 
 const MOCK_NODES = [
@@ -37,34 +29,30 @@ const DashboardModule: React.FC = () => {
       {/* Top Level Summary Cards - 12 Column Grid */}
       <div className="grid grid-cols-12 gap-6">
         {[
-          { label: '全国并发总占用', val: totalCurrent, total: totalPhysical, unit: '路', icon: Activity, color: 'text-blue-600', bg: 'bg-blue-50' },
-          { label: 'AI 实时算力消耗', val: MOCK_AI_POOL.realtimeOccupancy, total: MOCK_AI_POOL.globalPurchase, unit: '路', icon: Zap, color: 'text-purple-600', bg: 'bg-purple-50' },
-          { label: '全量在网号码', val: normalNumbers, total: totalNumbers, unit: '个', icon: Database, color: 'text-green-600', bg: 'bg-green-50' },
-          { label: '活跃企业主体', val: activeEnterprises, total: totalEnterprises, unit: '家', icon: Users, color: 'text-amber-600', bg: 'bg-amber-50' },
+          { label: '全国并发总占用', val: totalCurrent, total: totalPhysical, unit: '路', color: 'text-blue-600', bg: 'bg-blue-50' },
+          { label: 'AI 实时算力消耗', val: MOCK_AI_POOL.realtimeOccupancy, total: MOCK_AI_POOL.globalPurchase, unit: '路', color: 'text-purple-600', bg: 'bg-purple-50' },
+          { label: '全量在网号码库', val: normalNumbers, total: totalNumbers, unit: '个', color: 'text-green-600', bg: 'bg-green-50' },
+          { label: '活跃企业主体数', val: activeEnterprises, total: totalEnterprises, unit: '家', color: 'text-amber-600', bg: 'bg-amber-50' },
         ].map((card, i) => (
           <motion.div 
             key={i}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: i * 0.05 }}
-            className="col-span-3 bg-white p-6 rounded-[32px] shadow-sm border border-white hover:shadow-xl transition-all group"
+            className="col-span-3 bg-white p-8 rounded-[40px] shadow-sm border border-white hover:shadow-xl transition-all group"
           >
-            <div className="flex items-center justify-between mb-6">
-              <div className={cn("p-4 rounded-2xl", card.bg)}>
-                <card.icon className={cn("w-6 h-6", card.color)} />
-              </div>
-              <div className="text-right">
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">{card.label}</p>
-                <div className="flex items-baseline justify-end gap-1">
-                  <span className="text-2xl font-black tracking-tighter text-gray-900">{card.val.toLocaleString()}</span>
-                  <span className="text-[10px] font-bold text-gray-400">/ {card.total.toLocaleString()} {card.unit}</span>
-                </div>
+            <div className="mb-8">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none mb-3">{card.label}</p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-4xl font-black tracking-tighter text-gray-900 tabular-nums">{card.val.toLocaleString()}</span>
+                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">/ {card.total.toLocaleString()} {card.unit}</span>
               </div>
             </div>
-            <div className="h-1.5 bg-gray-50 rounded-full overflow-hidden">
-               <div 
-                className={cn("h-full rounded-full transition-all duration-1000", card.color.replace('text', 'bg'))}
-                style={{ width: `${(card.val / card.total) * 100}%` }}
+            <div className="h-2 bg-gray-50 rounded-full overflow-hidden">
+               <motion.div 
+                initial={{ width: 0 }}
+                animate={{ width: `${(card.val / card.total) * 100}%` }}
+                className={cn("h-full rounded-full", card.color.replace('text', 'bg'))}
                />
             </div>
           </motion.div>
@@ -73,84 +61,93 @@ const DashboardModule: React.FC = () => {
 
       {/* Main Grid - 12 Column */}
       <div className="grid grid-cols-12 gap-8">
-        {/* Left: AI Resource Pool Detail - 4 Column */}
-        <div className="col-span-4 bg-white p-8 rounded-[40px] shadow-sm border border-white space-y-8">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-black tracking-tight text-gray-900">AI 算力水池 (跨节点)</h3>
-            <span className="px-3 py-1 bg-blue-50 text-blue-600 text-[9px] font-black rounded-full italic uppercase">Real-time</span>
+        {/* Left: AI Resource Detail - 4 Column */}
+        <div className="col-span-4 bg-white p-10 rounded-[40px] shadow-sm border border-white flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-10">
+              <h3 className="text-xl font-black tracking-tight text-gray-900 uppercase">AI 算力水池矩阵</h3>
+              <span className="text-[9px] font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-full italic uppercase tracking-widest">Global Sync</span>
+            </div>
+
+            <div className="space-y-6">
+              {[
+                { label: '普通话算力 (GPT-4o LLM)', stats: MOCK_AI_POOL.mandarin },
+                { label: '粤语算力 (Llama-3 Fine-tuned)', stats: MOCK_AI_POOL.cantonese },
+              ].map((pool, i) => (
+                <div key={i} className="p-8 bg-gray-50/50 rounded-[32px] border border-dashed border-gray-200">
+                  <div className="flex items-center justify-between mb-6">
+                     <p className="text-[10px] font-black text-gray-900 uppercase tracking-[0.1em]">{pool.label}</p>
+                     <p className="text-[11px] font-black text-blue-600 tabular-nums">
+                      {Math.round((pool.stats.realtimeOccupancy / pool.stats.globalPurchase) * 100)}%
+                     </p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-8">
+                     <div>
+                        <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1">总配额</p>
+                        <p className="text-xl font-black tabular-nums">{pool.stats.globalPurchase.toLocaleString()}</p>
+                     </div>
+                     <div>
+                        <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1">实时占用</p>
+                        <p className="text-xl font-black text-blue-600 tabular-nums">{pool.stats.realtimeOccupancy.toLocaleString()}</p>
+                     </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="space-y-4">
-            {[
-              { label: '普通话算力 (GPT-4o Backend)', stats: MOCK_AI_POOL.mandarin },
-              { label: '粤语算力 (Custom Llama-3)', stats: MOCK_AI_POOL.cantonese },
-            ].map((pool, i) => (
-              <div key={i} className="p-6 bg-gray-50/50 rounded-3xl border border-dashed border-gray-200">
-                <div className="flex items-center justify-between mb-4">
-                   <p className="text-[11px] font-black text-gray-900 uppercase">{pool.label}</p>
-                   <p className="text-[10px] font-bold text-blue-600">
-                    {Math.round((pool.stats.realtimeOccupancy / pool.stats.globalPurchase) * 100)}%
-                   </p>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                   <div className="space-y-1">
-                      <p className="text-[9px] text-gray-400 font-bold uppercase">总容量</p>
-                      <p className="text-base font-black tabular-nums">{pool.stats.globalPurchase.toLocaleString()}</p>
-                   </div>
-                   <div className="space-y-1">
-                      <p className="text-[9px] text-gray-400 font-bold uppercase">实时占用</p>
-                      <p className="text-base font-black text-blue-600 tabular-nums">{pool.stats.realtimeOccupancy.toLocaleString()}</p>
-                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="p-5 bg-red-50 rounded-2xl border border-red-100 flex gap-4">
-             <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
-             <p className="text-[10px] text-red-800 font-medium leading-relaxed">
-               当前动态 Quota 分配已接近物理总容量。建议 24h 内扩容 500 路 ASR 实例。
+          <div className="mt-8 p-6 bg-red-50 rounded-3xl border border-red-100/50">
+             <p className="text-[11px] text-red-800 font-bold leading-relaxed uppercase tracking-tighter">
+               DYNAMIC QUOTA ALERT: ALLOCATION APPROACHING PHYSICAL CAPACITY. SCALE-OUT REOMMENDED WITHIN 24H.
              </p>
           </div>
         </div>
 
-        {/* Center: Node Heatmap - 8 Column */}
-        <div className="col-span-8 bg-[#1A1A1A] p-8 rounded-[40px] shadow-2xl relative overflow-hidden flex flex-col">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-blue-600/10 blur-[100px]"></div>
+        {/* Center: Node Topology - 8 Column */}
+        <div className="col-span-8 bg-[#1A1A1A] p-10 rounded-[40px] shadow-2xl relative overflow-hidden flex flex-col">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 blur-[120px]"></div>
           
-          <div className="relative z-10 space-y-8 flex-1 flex flex-col">
+          <div className="relative z-10 space-y-10 flex-1 flex flex-col">
             <div className="flex items-center justify-between">
-               <div className="flex items-center gap-3">
-                  <Server className="w-6 h-6 text-blue-500" />
-                  <h3 className="text-lg font-black tracking-tight text-white uppercase">SBC 边缘物理节点 (Latency: 12ms)</h3>
+               <div>
+                  <h3 className="text-2xl font-black tracking-tight text-white uppercase">SBC 边缘物理网关 (Cluster 0x1A)</h3>
+                  <p className="text-[9px] text-gray-500 font-bold uppercase tracking-[0.4em] mt-2 italic">Hyper-Scale Edge Infrastructure</p>
                </div>
-               <div className="px-3 py-1 bg-white/10 rounded-lg text-[9px] font-black text-gray-400 uppercase tracking-widest italic">Sync: Enabled</div>
+               <div className="px-5 py-2 bg-white/5 rounded-2xl text-[9px] font-black text-gray-400 uppercase tracking-widest border border-white/5">Cluster Latency: 12ms</div>
             </div>
 
-            <div className="grid grid-cols-2 gap-6 flex-1 overflow-auto pr-2 custom-scrollbar">
+            <div className="grid grid-cols-2 gap-8 flex-1 overflow-auto pr-4 custom-scrollbar">
               {MOCK_NODES.map(node => (
-                <div key={node.id} className="p-6 bg-white/5 rounded-3xl border border-white/10 hover:bg-white/10 transition-all cursor-pointer group">
-                   <div className="flex items-center justify-between mb-6">
-                      <p className="text-sm font-black text-white group-hover:text-blue-500 transition-colors uppercase">{node.name}</p>
-                      <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)]"></div>
+                <div key={node.id} className="p-8 bg-white/5 rounded-[40px] border border-white/10 hover:bg-white/10 transition-all cursor-pointer group">
+                   <div className="flex items-center justify-between mb-8">
+                      <p className="text-base font-black text-white group-hover:text-blue-500 transition-colors uppercase tracking-tight">{node.name}</p>
+                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.8)]"></div>
                    </div>
-                   <div className="space-y-4">
-                      <div className="space-y-2">
-                         <div className="flex justify-between text-[9px] text-gray-500 font-bold uppercase">
-                            <span>物理并发占用</span>
-                            <span className="text-white">{node.physicalCurrent} / {node.physicalMax}</span>
+                   <div className="space-y-6">
+                      <div className="space-y-3">
+                         <div className="flex justify-between text-[9px] text-gray-500 font-bold uppercase tracking-widest">
+                            <span>物理并发吞吐 / Load</span>
+                            <span className="text-white font-black">{node.physicalCurrent} / {node.physicalMax}</span>
                          </div>
-                         <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                            <div className="h-full bg-blue-600 rounded-full" style={{ width: `${(node.physicalCurrent/node.physicalMax)*100}%` }} />
+                         <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                            <motion.div 
+                              initial={{ width: 0 }}
+                              animate={{ width: `${(node.physicalCurrent/node.physicalMax)*100}%` }}
+                              className="h-full bg-blue-600 rounded-full shadow-[0_0_8px_rgba(0,102,255,0.4)]" 
+                            />
                          </div>
                       </div>
-                      <div className="space-y-2">
-                         <div className="flex justify-between text-[9px] text-gray-500 font-bold uppercase">
-                            <span>专线带宽容量</span>
-                            <span className="text-white">{node.bandwidthCurrent} Mbps</span>
+                      <div className="space-y-3">
+                         <div className="flex justify-between text-[9px] text-gray-500 font-bold uppercase tracking-widest">
+                            <span>专线带宽水位 / Bandwidth</span>
+                            <span className="text-white font-black">{node.bandwidthCurrent} Mbps</span>
                          </div>
-                         <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                            <div className="h-full bg-cyan-400 rounded-full" style={{ width: `${(node.bandwidthCurrent/node.bandwidthMax)*100}%` }} />
+                         <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                            <motion.div 
+                              initial={{ width: 0 }}
+                              animate={{ width: `${(node.bandwidthCurrent/node.bandwidthMax)*100}%` }}
+                              className="h-full bg-cyan-400 rounded-full shadow-[0_0_8px_rgba(34,211,238,0.4)]" 
+                            />
                          </div>
                       </div>
                    </div>
@@ -158,37 +155,37 @@ const DashboardModule: React.FC = () => {
               ))}
             </div>
 
-            <div className="pt-6 border-t border-white/10 flex items-center justify-between">
-               <div className="flex gap-6">
-                  <div className="flex items-center gap-2">
+            <div className="pt-10 border-t border-white/10 flex items-center justify-between">
+               <div className="flex gap-10">
+                  <div className="flex items-center gap-3">
                      <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                     <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">物理负载</span>
+                     <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Physical Load</span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                      <div className="w-2 h-2 rounded-full bg-cyan-400"></div>
-                     <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">专线负载</span>
+                     <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">ISP Bandwidth</span>
                   </div>
                </div>
-               <button className="text-[10px] font-black text-blue-500 uppercase tracking-widest hover:underline">全网物理拓扑矩阵</button>
+               <button className="text-[10px] font-black text-blue-500 uppercase tracking-[0.3em] hover:underline">Global Topology View</button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom Bar */}
-      <div className="bg-white p-6 rounded-[32px] border border-gray-100 flex items-center justify-between shadow-sm">
-         <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center animate-bounce">
-               <AlertCircle className="w-5 h-5" />
+      {/* Bottom Alert Strip */}
+      <div className="bg-white px-10 py-8 rounded-[40px] border border-gray-100 flex items-center justify-between shadow-sm">
+         <div className="flex items-center gap-6">
+            <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center animate-pulse border border-amber-100 shadow-sm">
+               <span className="text-xl font-black">!</span>
             </div>
             <div>
-               <p className="text-xs font-black text-gray-900 tracking-tight">即将到期的资源提醒</p>
-               <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Warnings Distribution</p>
+               <p className="text-sm font-black text-gray-900 tracking-tight uppercase">Resource Monitoring Insights</p>
+               <p className="text-[9px] text-gray-400 font-bold uppercase tracking-[0.4em] mt-1">Real-time Anomaly Detection Service</p>
             </div>
          </div>
-         <div className="flex gap-4">
-            {['字节跳动 (号码库 15天后)', '腾讯科技 (欠费警示)', '联通-03 (巡检预定)'].map((t, i) => (
-              <div key={i} className="px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-[10px] font-bold text-gray-400">
+         <div className="flex gap-6">
+            {['BYTEDANCE (15D Expire)', 'TENCENT (Billing Warning)', 'UNICOM-03 (Maintenance)'].map((t, i) => (
+              <div key={i} className="px-6 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-[9px] font-black text-gray-500 uppercase tracking-widest">
                 {t}
               </div>
             ))}
