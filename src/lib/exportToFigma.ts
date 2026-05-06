@@ -1,13 +1,14 @@
 export const exportDomToFigmaSvg = async (targetSelector: string = '#figma-export-container'): Promise<{ success: boolean; message: string }> => {
-  const container = document.querySelector(targetSelector);
+  const container = document.querySelector(targetSelector) as HTMLElement;
   if (!container) return { success: false, message: '未找到导出目标' };
 
-  // 1. Calculate precise bounding box without arbitrary padding
-  const rect = container.getBoundingClientRect();
-  const width = rect.width;
-  const height = rect.height;
-  const offsetX = rect.left;
-  const offsetY = rect.top;
+  // 1. Force the container to a clean state for measurement
+  const originalScrollTop = container.scrollTop;
+  const originalScrollLeft = container.scrollLeft;
+  
+  // Get pure dimensions
+  const width = container.offsetWidth;
+  const height = container.offsetHeight;
 
   const processNode = (el: Element, originX: number, originY: number): string => {
     if (!(el instanceof HTMLElement || el instanceof SVGElement)) return '';
@@ -30,7 +31,7 @@ export const exportDomToFigmaSvg = async (targetSelector: string = '#figma-expor
       items.push(`<rect x="0" y="0" width="${nodeRect.width}" height="${nodeRect.height}" fill="${hasBg ? bg : 'none'}" stroke="${bW > 0 ? style.borderColor : 'none'}" stroke-width="${bW}" rx="${rx}" fill-opacity="${style.opacity}" />`);
     }
 
-    // SVG / Icons path conversion
+    // SVG Icons
     if (el instanceof SVGElement && el.tagName.toLowerCase() === 'svg') {
       const paths = Array.from(el.querySelectorAll('path, circle, rect, polygon, line, polyline')).map(p => {
         const pClone = p.cloneNode(true) as Element;
@@ -65,7 +66,7 @@ export const exportDomToFigmaSvg = async (targetSelector: string = '#figma-expor
 
     if (items.length === 0) return '';
     
-    // Grouping: strictly avoid single-child groups if they don't add semantic value
+    // Grouping
     if (items.length >= 2) {
       return `<g transform="translate(${relX}, ${relY})" data-tag="${el.tagName.toLowerCase()}">${items.join('')}</g>`;
     } else {
@@ -80,15 +81,18 @@ export const exportDomToFigmaSvg = async (targetSelector: string = '#figma-expor
   };
 
   try {
-    const rawContent = processNode(container, offsetX, offsetY);
+    // Measurement phase
+    const rect = container.getBoundingClientRect();
+    const rawContent = Array.from(container.children).map(c => processNode(c, rect.left, rect.top)).join('');
+
     const svgResult = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
 <rect width="100%" height="100%" fill="none" />
 ${rawContent}
 </svg>`.trim();
 
     await navigator.clipboard.writeText(svgResult);
-    return { success: true, message: 'SVG 矢量代码已校准并写入剪贴板 (text/plain)。' };
+    return { success: true, message: '矢量导出成功 (已校准分辨率与偏移)。' };
   } catch (err) {
-    return { success: false, message: '复制失败' };
+    return { success: false, message: '导出失败' };
   }
 };
