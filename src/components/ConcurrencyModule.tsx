@@ -14,7 +14,7 @@ import {
   ActivitySquare
 } from 'lucide-react';
 import { cn, calculateEffectiveConcurrency } from '../lib/utils';
-import { SBCNode, AIResourceStats } from '../types';
+import { SBCNode, AIResourceStats, GlobalResource } from '../types';
 
 interface Props {
   sbcNodes: SBCNode[];
@@ -29,8 +29,12 @@ const ConcurrencyModule: React.FC<Props> = ({
   aiPool, 
   setAiPool 
 }) => {
+  const globalRes: GlobalResource = {
+    ttsAvailable: Math.max(0, aiPool.globalPurchase - aiPool.fixedGuarantee - aiPool.realtimeOccupancy),
+    asrAvailable: Math.max(0, aiPool.globalPurchase - aiPool.fixedGuarantee - aiPool.realtimeOccupancy)
+  };
+
   const dynamicPoolCapacity = aiPool.globalPurchase - aiPool.fixedGuarantee;
-  const aiDynamicRemained = dynamicPoolCapacity - aiPool.realtimeOccupancy;
   const isOverSold = aiPool.dynamicQuota > dynamicPoolCapacity;
 
   return (
@@ -118,7 +122,7 @@ const ConcurrencyModule: React.FC<Props> = ({
 
          <div className="grid grid-cols-3 gap-8">
             {sbcNodes.map(node => {
-              const effective = calculateEffectiveConcurrency(node, aiPool);
+              const effective = calculateEffectiveConcurrency(node, globalRes);
               
               return (
                 <motion.div 

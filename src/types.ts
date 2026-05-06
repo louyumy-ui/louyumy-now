@@ -16,6 +16,11 @@ export interface Operator {
   remark: string;
 }
 
+export interface GlobalResource {
+  ttsAvailable: number;
+  asrAvailable: number;
+}
+
 export interface SBCNode {
   id: string;
   name: string;

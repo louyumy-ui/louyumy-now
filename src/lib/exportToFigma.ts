@@ -1,11 +1,21 @@
-export const exportDomToFigmaSvg = async (targetIdOrElement: string | HTMLElement): Promise<boolean> => {
-  const rootElement = typeof targetIdOrElement === 'string' 
-    ? document.getElementById(targetIdOrElement) 
-    : targetIdOrElement;
+export const exportDomToFigmaSvg = async (targetId: string = 'figma-export-container'): Promise<boolean> => {
+  const rootElement = document.getElementById(targetId);
 
-  if (!rootElement) return false;
-  const rootRect = rootElement.getBoundingClientRect();
+  if (!rootElement) {
+    console.error(`Export container #${targetId} not found`);
+    return false;
+  }
+
+  // Use offsetWidth/Height for the 1:1 "natural" dimensions
+  const width = rootElement.offsetWidth;
+  const height = rootElement.offsetHeight;
   
+  // Calculate current scale to remove its effect
+  const rect = rootElement.getBoundingClientRect();
+  const scaleX = rect.width / width;
+  const scaleY = rect.height / height;
+  const scale = (scaleX + scaleY) / 2; // Assume uniform scale for UI
+
   const getElementStyles = (el: HTMLElement | SVGElement) => {
     const style = window.getComputedStyle(el);
     return {
@@ -17,19 +27,21 @@ export const exportDomToFigmaSvg = async (targetIdOrElement: string | HTMLElemen
     };
   };
 
-  const domToSvgNested = (element: Element, parentRect: { left: number, top: number }): string => {
+  const domToSvgNested = (element: Element, parentRect: DOMRect): string => {
     if (!(element instanceof HTMLElement || element instanceof SVGElement)) return '';
     if (element.getAttribute('data-svg-copy-ignore') === 'true') return '';
     
     const styles = getElementStyles(element);
     if (styles.visibility === 'hidden' || styles.opacity === '0' || styles.display === 'none') return '';
     
-    const rect = element.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return '';
+    const currentRect = element.getBoundingClientRect();
+    if (currentRect.width === 0 || currentRect.height === 0) return '';
 
-    // Calculate relative to the root capture element
-    const relX = rect.left - parentRect.left;
-    const relY = rect.top - parentRect.top;
+    // Calculate logical relative positions (removes scale)
+    const relX = (currentRect.left - parentRect.left) / scale;
+    const relY = (currentRect.top - parentRect.top) / scale;
+    const logicalWidth = currentRect.width / scale;
+    const logicalHeight = currentRect.height / scale;
     
     let currentLevelParts: string[] = [];
 
@@ -38,11 +50,11 @@ export const exportDomToFigmaSvg = async (targetIdOrElement: string | HTMLElemen
       const hasBackground = styles.backgroundColor !== 'rgba(0, 0, 0, 0)' && styles.backgroundColor !== 'transparent';
       const hasBorder = parseFloat(styles.borderWidth) > 0;
       if (hasBackground || hasBorder) {
-        const rx = parseFloat(styles.borderRadius) || 0;
+        const rx = (parseFloat(styles.borderRadius) || 0);
         const fill = hasBackground ? styles.backgroundColor : 'none';
         const stroke = hasBorder ? styles.borderColor : 'none';
-        const strokeWidth = hasBorder ? styles.borderWidth : '0';
-        currentLevelParts.push(`<rect x="0" y="0" width="${rect.width}" height="${rect.height}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" rx="${rx}" fill-opacity="${styles.opacity}" stroke-opacity="${styles.opacity}" />`);
+        const strokeWidth = hasBorder ? (parseFloat(styles.borderWidth) || 0) : 0;
+        currentLevelParts.push(`<rect x="0" y="0" width="${logicalWidth}" height="${logicalHeight}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" rx="${rx}" fill-opacity="${styles.opacity}" stroke-opacity="${styles.opacity}" />`);
       }
     }
 
@@ -53,11 +65,12 @@ export const exportDomToFigmaSvg = async (targetIdOrElement: string | HTMLElemen
       if (!clone.getAttribute('stroke') || clone.getAttribute('stroke') === 'currentColor') clone.setAttribute('stroke', actualColor);
       if (clone.getAttribute('fill') === 'currentColor') clone.setAttribute('fill', actualColor);
       
-      clone.setAttribute('width', rect.width.toString());
-      clone.setAttribute('height', rect.height.toString());
+      clone.setAttribute('width', logicalWidth.toString());
+      clone.setAttribute('height', logicalHeight.toString());
       clone.removeAttribute('x');
       clone.removeAttribute('y');
       clone.style.position = 'static';
+      clone.style.transform = 'none'; // Clear any internal transforms that get computed
       
       return `<g transform="translate(${relX}, ${relY})" data-figma-type="icon">${clone.outerHTML}</g>`;
     }
@@ -74,8 +87,8 @@ export const exportDomToFigmaSvg = async (targetIdOrElement: string | HTMLElemen
         
         if (textRect.width > 0) {
           const fontSize = parseFloat(styles.fontSize);
-          const tx = textRect.left - rect.left;
-          const ty = textRect.top - rect.top + fontSize * 0.8;
+          const tx = (textRect.left - currentRect.left) / scale;
+          const ty = ((textRect.top - currentRect.top) / scale) + fontSize * 0.8;
           
           const safeFontFamily = styles.fontFamily.includes('"') ? styles.fontFamily : `"${styles.fontFamily}"`;
           const safeText = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -85,75 +98,37 @@ export const exportDomToFigmaSvg = async (targetIdOrElement: string | HTMLElemen
       }
     }
 
-    // 4. Inputs/Selects
-    if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement || element instanceof HTMLSelectElement) {
-      let text = '';
-      if (element instanceof HTMLSelectElement) {
-        text = element.options[element.selectedIndex]?.text || '';
-      } else {
-        text = (element as HTMLInputElement).value || (element as HTMLInputElement).placeholder || '';
-      }
-      
-      if (text) {
-        const fontSize = parseFloat(styles.fontSize);
-        const tx = 10;
-        const ty = (rect.height / 2) + (fontSize * 0.3);
-        const safeFontFamily = styles.fontFamily.includes('"') ? styles.fontFamily : `"${styles.fontFamily}"`;
-        const safeText = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        currentLevelParts.push(`<text x="${tx}" y="${ty}" fill="${styles.color}" font-family='${safeFontFamily}' font-size="${styles.fontSize}" font-weight="${styles.fontWeight}">${safeText}</text>`);
-      }
-    }
-
-    // 5. Children recursion
+    // 4. Children recursion
     const childrenSvg: string[] = [];
     for (const child of Array.from(element.children)) {
-      const svg = domToSvgNested(child, rect);
+      const svg = domToSvgNested(child, currentRect);
       if (svg) childrenSvg.push(svg);
     }
 
     const allLines = [...currentLevelParts, ...childrenSvg];
     if (allLines.length === 0) return '';
 
-    // Grouping logic: 
-    // 1. Root element always wraps.
-    // 2. Wrap if 2 or more elements (e.g., Icon + Text).
-    // 3. DO NOT wrap if only 1 element (to avoid single-text groups).
     const isRoot = element === rootElement;
-    const shouldWrap = allLines.length >= 2 || isRoot;
-
     const tagName = element.tagName.toLowerCase();
-    const id = element.id ? `#${element.id}` : '';
+    const idAttr = element.id ? `#${element.id}` : '';
     const className = element.className && typeof element.className === 'string' ? `.${element.className.split(' ')[0]}` : '';
 
-    if (shouldWrap) {
-      return `<g transform="translate(${relX}, ${relY})" data-name="${tagName}${id}${className}">
-        ${allLines.join('\n')}
-      </g>`;
-    } else {
-      // If we don't wrap, we must still respect the relative position of the single child.
-      // Since allLines[0] already contains internal relative coordinates, we just need 
-      // to add our relX/relY to it.
-      const line = allLines[0];
-      if (line.startsWith('<text ') || line.startsWith('<rect ')) {
-        return line.replace(/x="([\d.]+)"/, (_, x) => `x="${parseFloat(x) + relX}"`)
-                   .replace(/y="([\d.]+)"/, (_, y) => `y="${parseFloat(y) + relY}"`);
-      }
-      if (line.startsWith('<g transform="translate(')) {
-        return line.replace(/transform="translate\(([\d.-]+), ([\d.-]+)\)"/, (_, x, y) => 
-          `transform="translate(${parseFloat(x) + relX}, ${parseFloat(y) + relY})"`);
-      }
-      return line;
-    }
+    return `<g transform="translate(${relX}, ${relY})" data-name="${tagName}${idAttr}${className}">
+      ${allLines.join('\n')}
+    </g>`;
   };
 
   try {
-    const width = Math.ceil(rootRect.width);
-    const height = Math.ceil(rootRect.height);
+    const rootRect = rootElement.getBoundingClientRect();
     const contentSvg = domToSvgNested(rootElement, rootRect);
+    
+    // Final SVG wrap matching the natural offset dimensions
     const svgContent = `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
   <rect width="${width}" height="${height}" fill="white" fill-opacity="0" />
-  ${contentSvg}
+  <g transform="translate(0, 0)">
+    ${contentSvg}
+  </g>
 </svg>`.trim();
 
     const blobHtml = new Blob([svgContent], { type: 'text/html' });

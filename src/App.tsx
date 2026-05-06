@@ -160,7 +160,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="w-[1920px] h-[1080px] bg-[#F4F7FE] flex font-sans text-[#1A1A1A] mx-auto overflow-hidden shadow-2xl">
+    <div id="figma-export-container" className="w-[1920px] h-[1080px] bg-[#F4F7FE] flex font-sans text-[#1A1A1A] mx-auto overflow-hidden shadow-2xl">
       <Toaster position="top-right" richColors />
       
       {/* Sidebar */}
