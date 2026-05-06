@@ -1,4 +1,4 @@
-import { LineGroup, PhoneNumber, Agent, GlobalConfig, Operator } from './types';
+import { LineGroup, PhoneNumber, Agent, GlobalConfig, Operator, SBCNode, Enterprise, SubAccount } from './types';
 
 export const OPERATORS = ['中国移动', '中国联通', '中国电信'];
 export const CITIES = ['韶关', '茂名', '惠州', '广州', '深圳', '成都', '北京', '上海'];
@@ -9,6 +9,52 @@ export const INITIAL_OPERATORS: Operator[] = [
   { id: '1', name: '中国移动', remark: '移动全国业务' },
   { id: '2', name: '中国联通', remark: '联通全国业务' },
   { id: '3', name: '中国电信', remark: '电信全国业务' },
+];
+
+export const INITIAL_SBC_NODES: SBCNode[] = [
+  {
+    id: 'sbc-01',
+    name: '星纵120-联通主网关',
+    physicalMax: 500,
+    physicalCurrent: 70,
+    bandwidthMax: 1200, // 预计1200路
+    bandwidthCurrent: 400,
+    cpsMax: 30,
+    cpsCurrent: 10,
+    status: 'online',
+    location: '上海电信机房'
+  },
+  {
+    id: 'sbc-02',
+    name: '华为SoftCo-核心北向',
+    physicalMax: 1000,
+    physicalCurrent: 350,
+    bandwidthMax: 2000,
+    bandwidthCurrent: 800,
+    cpsMax: 50,
+    cpsCurrent: 25,
+    status: 'online',
+    location: '广州移动机房'
+  }
+];
+
+export const INITIAL_ENTERPRISES: Enterprise[] = [
+  {
+    id: 'ent-01',
+    name: '中和信贷有限公司',
+    status: 'active',
+    expiryDate: '2026-12-31',
+    concurrencyQuota: 200,
+    minutesQuota: 50000
+  },
+  {
+    id: 'ent-02',
+    name: '龙行金融外包',
+    status: 'expired',
+    expiryDate: '2024-04-30',
+    concurrencyQuota: 100,
+    minutesQuota: 10000
+  }
 ];
 
 export const INITIAL_LINE_GROUPS: LineGroup[] = [
@@ -22,25 +68,8 @@ export const INITIAL_LINE_GROUPS: LineGroup[] = [
     availableConcurrency: 120,
     maxCPS: 30,
     currentCPS: 0,
-    onlineCount: 0,
-    currentOnlineCount: 0,
     status: 'enabled',
     remark: '韶关测试线路',
-  },
-  {
-    id: '2',
-    province: '广东',
-    city: '茂名',
-    operator: '中国联通',
-    areaCode: '0668',
-    totalConcurrency: 24,
-    availableConcurrency: 24,
-    maxCPS: 30,
-    currentCPS: 0,
-    onlineCount: 0,
-    currentOnlineCount: 0,
-    status: 'enabled',
-    remark: '茂名联通线路',
   },
   {
     id: '3',
@@ -52,8 +81,6 @@ export const INITIAL_LINE_GROUPS: LineGroup[] = [
     availableConcurrency: 1000,
     maxCPS: 30,
     currentCPS: 0,
-    onlineCount: 0,
-    currentOnlineCount: 0,
     status: 'enabled',
     remark: '惠州核心线路',
   },
@@ -63,6 +90,8 @@ export const INITIAL_NUMBERS: PhoneNumber[] = [
   ...Array.from({ length: 20 }).map((_, i) => ({
     id: `idle-${i}`,
     number: Math.floor(80000000 + Math.random() * 9999999).toString(),
+    province: '广东',
+    city: i % 2 === 0 ? '深圳' : '广州',
     operator: i < 7 ? '中国移动' : i < 14 ? '中国联通' : '中国电信',
     lineGroupId: (i % 3 + 1).toString(),
     businessType: '催收业务',
@@ -73,62 +102,19 @@ export const INITIAL_NUMBERS: PhoneNumber[] = [
     remark: '测试空闲号',
   })),
   {
-    id: '1',
-    number: '88880001',
+    id: 'num-buffering',
+    number: '88889999',
+    province: '浙江',
+    city: '杭州',
     lineGroupId: '1',
     operator: '中国移动',
-    dailyCalls: 45,
-    totalCalls: 450,
-    displayStatus: 'active',
-    status: 'normal',
-    agentId: '1',
-    businessType: '营销推广',
-    createdAt: '2026-03-01 10:00:00',
-    remark: '主推号',
-  },
-  {
-    id: '2',
-    number: '88880002',
-    lineGroupId: '1',
-    operator: '中国移动',
-    dailyCalls: 12,
-    totalCalls: 210,
-    displayStatus: 'active' as any,
-    status: 'cooling' as any,
-    agentId: '1',
-    businessType: '催收业务',
-    coolingReason: '过去 1 小时内，累计拒接超过 10 次',
-    createdAt: '2026-03-05 14:30:00',
-    remark: '冷却中',
-    coolingStartTime: '2026-03-31T06:00:00Z',
-  },
-  {
-    id: '3',
-    number: '66661111',
-    lineGroupId: '1',
-    operator: '中国电信',
-    dailyCalls: 0,
-    totalCalls: 1200,
-    displayStatus: 'inactive' as any,
-    status: 'suspended_with_agent' as any,
-    agentId: '2',
-    businessType: '客户回访',
-    createdAt: '2026-03-10 09:00:00',
-    remark: '随坐席挂起中',
-  },
-  {
-    id: '4',
-    number: '22223333',
-    lineGroupId: '1',
-    operator: '中国联通',
     dailyCalls: 5,
-    totalCalls: 890,
-    displayStatus: 'inactive' as any,
-    status: 'disabled' as any,
-    businessType: '行政通知',
-    createdAt: '2026-03-15 16:20:00',
-    remark: '高频标记已停用',
-  },
+    totalCalls: 100,
+    displayStatus: 'active',
+    status: 'buffering',
+    businessType: '营销推广',
+    remark: '欠费缓冲中',
+  }
 ];
 
 export const INITIAL_AGENTS: Agent[] = [
@@ -158,13 +144,10 @@ export const INITIAL_CONFIG: GlobalConfig = {
   },
   concurrencyRule: {
     defaultCPS: 30,
-    maxGlobalVoiceCloneConcurrency: 10,
+    bandwidthMultiplier: 8.5
   },
   forbiddenHours: {
     start: '22:00',
     end: '08:00',
-  },
-  autoReplenishCooling: true,
-  autoReplenishDisabled: true,
-  replenishLimit24h: 50,
+  }
 };

@@ -1,12 +1,32 @@
 export type LineStatus = 'enabled' | 'disabled';
 export type AgentStatus = 'enabled' | 'disabled' | 'archived';
-export type NumberStatus = 'normal' | 'cooling' | 'disabled' | 'suspended_with_agent';
+export type NumberStatus = 
+  | 'normal' 
+  | 'cooling' 
+  | 'disabled' 
+  | 'suspended_with_agent' 
+  | 'buffering' // 缓冲期
+  | 'frozen'    // 冻结期
+  | 'public';   // 公共期
 export type DisplayStatus = 'active' | 'inactive';
 
 export interface Operator {
   id: string;
   name: string;
   remark: string;
+}
+
+export interface SBCNode {
+  id: string;
+  name: string;
+  physicalMax: number;
+  physicalCurrent: number;
+  bandwidthMax: number;
+  bandwidthCurrent: number; // 每一兆对应 8.5 路并发计算得出
+  cpsMax: number;
+  cpsCurrent: number;
+  status: 'online' | 'offline' | 'maint';
+  location: string;
 }
 
 export interface LineGroup {
@@ -19,10 +39,14 @@ export interface LineGroup {
   availableConcurrency: number;
   maxCPS: number;
   currentCPS: number;
-  onlineCount: number;
-  currentOnlineCount: number;
   status: LineStatus;
   remark: string;
+}
+
+export interface PhoneHistory {
+  time: string;
+  user: string;
+  business: string;
 }
 
 export interface PhoneNumber {
@@ -30,6 +54,8 @@ export interface PhoneNumber {
   number: string;
   lineGroupId: string;
   operator: string;
+  province: string;
+  city: string;
   dailyCalls: number;
   totalCalls: number;
   displayStatus: DisplayStatus;
@@ -40,6 +66,7 @@ export interface PhoneNumber {
   createdAt?: string;
   remark?: string;
   coolingStartTime?: string;
+  history?: PhoneHistory[];
 }
 
 export interface Agent {
@@ -50,8 +77,8 @@ export interface Agent {
   numberCount: number;
   availableNumberCount: number;
   concurrencyLimit: number;
-  associatedAccounts: string[]; // List of account names or IDs
-  associatedScripts: string[]; // List of script names or IDs
+  associatedAccounts: string[]; 
+  associatedScripts: string[]; 
   status: AgentStatus;
   remark: string;
   selectionMode?: 'auto' | 'manual';
@@ -77,34 +104,39 @@ export interface AIResourceStats {
   };
 }
 
-export interface AIResourceAllocation {
+export interface Enterprise {
   id: string;
   name: string;
-  type: 'fixed' | 'dynamic';
-  language: 'mandarin' | 'cantonese';
-  limit: number;
-  occupancy: number;
-  status: 'active' | 'warning' | 'error';
+  status: 'active' | 'expired' | 'frozen';
+  expiryDate: string;
+  concurrencyQuota: number;
+  minutesQuota: number;
+}
+
+export interface SubAccount {
+  id: string;
+  name: string;
+  enterpriseId: string;
+  concurrencyQuota: number;
+  minutesQuota: number;
+  permissions: string[]; // ['admin', 'marketing', 'agent']
 }
 
 export interface GlobalConfig {
   coolingRule: {
-    rejectionLimit: number; // e.g., 10
-    rejectionWindow: number; // in hours, e.g., 1
-    shortCallDuration: number; // e.g., 3 seconds
-    shortCallCountLimit: number; // e.g., 5
-    shortCallWindow: number; // in hours, e.g., 1
-    coolingHours: number; // e.g., 2
+    rejectionLimit: number;
+    rejectionWindow: number;
+    shortCallDuration: number;
+    shortCallCountLimit: number;
+    shortCallWindow: number;
+    coolingHours: number;
   };
   concurrencyRule: {
     defaultCPS: number;
-    maxGlobalVoiceCloneConcurrency: number;
+    bandwidthMultiplier: number; // 1M = 8.5路
   };
   forbiddenHours: {
-    start: string; // "22:00"
-    end: string; // "08:00"
+    start: string;
+    end: string;
   };
-  autoReplenishCooling: boolean;
-  autoReplenishDisabled: boolean;
-  replenishLimit24h: number; // Max replenishment per day
 }
