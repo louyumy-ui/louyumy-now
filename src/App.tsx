@@ -114,35 +114,13 @@ const App: React.FC = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <DashboardModule 
-          sbcNodes={sbcNodes} 
-          numbers={numbers} 
-          aiPool={aiPool}
-          enterprises={enterprises}
-        />;
+        return <DashboardModule />;
       case 'resources':
-        return <ResourceModule 
-          operators={operators} 
-          setOperators={setOperators}
-          lineGroups={lineGroups}
-          setLineGroups={setLineGroups}
-          numbers={numbers}
-          setNumbers={setNumbers}
-          triggerCooling={triggerCooling}
-          config={config}
-        />;
+        return <ResourceModule />;
       case 'concurrency':
-        return <ConcurrencyModule 
-          sbcNodes={sbcNodes} 
-          setSbcNodes={setSbcNodes}
-          aiPool={aiPool}
-          setAiPool={setAiPool}
-        />;
+        return <ConcurrencyModule />;
       case 'enterprises':
-        return <EnterpriseModule 
-          enterprises={enterprises}
-          setEnterprises={setEnterprises}
-        />;
+        return <EnterpriseModule />;
       case 'agents':
         return <AgentModule 
           agents={agents} 
@@ -155,7 +133,7 @@ const App: React.FC = () => {
       case 'config':
         return <ConfigModule config={config} setConfig={setConfig} />;
       default:
-        return <DashboardModule sbcNodes={sbcNodes} numbers={numbers} aiPool={aiPool} enterprises={enterprises} />;
+        return <DashboardModule />;
     }
   };
 

@@ -18,13 +18,17 @@ export const SvgCopyButton: React.FC<SvgCopyButtonProps> = ({
 
   const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    // Default to document.body if no targetId provided
-    const target = targetId ? targetId : (document.body as any);
-    const success = await exportDomToFigmaSvg(target);
-    if (success) {
+    // Use targetId as selector if provided, otherwise default to capturing the main container and overlays
+    const selector = targetId ? `#${targetId}` : '#figma-export-container';
+    const result = await exportDomToFigmaSvg(selector);
+    
+    if (result.success) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
+    
+    // Add alert feedback as requested
+    alert(result.message);
   };
 
   return (
