@@ -197,14 +197,13 @@ const AgentModule: React.FC<Props> = ({ agents, setAgents, numbers, setNumbers, 
           className="px-8 py-5 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors"
         >
           <div className="flex items-center gap-3">
-            <Search className="w-5 h-5 text-gray-400" />
             <span className="text-sm font-black text-gray-900 uppercase tracking-widest">高级坐席检索系统</span>
           </div>
           <motion.div
             animate={{ rotate: isFiltersExpanded ? 180 : 0 }}
             transition={{ duration: 0.2 }}
           >
-            <ChevronDown className="w-4 h-4 text-gray-400" />
+            <span className="text-[9px] font-black uppercase text-gray-400">{isFiltersExpanded ? 'COLLAPSE' : 'EXPAND'}</span>
           </motion.div>
         </div>
 
@@ -219,22 +218,20 @@ const AgentModule: React.FC<Props> = ({ agents, setAgents, numbers, setNumbers, 
               <div className="p-8 flex flex-wrap items-center gap-6 border-t border-gray-50 bg-gray-50/30">
                 <button 
                   onClick={() => { resetForm(); setIsModalOpen(true); }}
-                  className="bg-[#1A1A1A] text-white px-8 py-4 rounded-2xl text-xs font-black hover:bg-black transition-all shadow-xl shadow-black/10 flex items-center gap-2"
+                  className="bg-[#1A1A1A] text-white px-8 py-4 rounded-2xl text-xs font-black hover:bg-black transition-all shadow-xl shadow-black/10"
                 >
-                  <Plus className="w-4 h-4" />
                   新建业务坐席
                 </button>
 
                 <div className="flex items-center gap-3">
                   <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">坐席名称</span>
                   <div className="relative w-48 group">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#0066FF]" />
                     <input 
                       type="text" 
                       placeholder="关键字检索" 
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 bg-white border border-gray-100 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#0066FF]/10 transition-all"
+                      className="w-full px-4 py-3 bg-white border border-gray-100 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#0066FF]/10 transition-all"
                     />
                   </div>
                 </div>
@@ -348,22 +345,22 @@ const AgentModule: React.FC<Props> = ({ agents, setAgents, numbers, setNumbers, 
                               setStep(1);
                               setIsModalOpen(true);
                             }}
-                            className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
-                          ><Layers className="w-4 h-4" /></button>
+                            className="text-[10px] font-black text-gray-400 hover:text-blue-600 transition-colors uppercase"
+                          >配置</button>
                           <button 
                             onClick={() => handleStatusChange(agent.id, agent.status === 'enabled' ? 'disabled' : 'enabled')}
-                            className="p-2 text-gray-400 hover:text-amber-600 transition-colors"
-                          ><Activity className="w-4 h-4" /></button>
+                            className="text-[10px] font-black text-gray-400 hover:text-amber-600 transition-colors uppercase"
+                          >状态</button>
                           <button 
                             onClick={() => handleStatusChange(agent.id, 'archived')}
-                            className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
-                          ><Archive className="w-4 h-4" /></button>
+                            className="text-[10px] font-black text-gray-400 hover:text-blue-600 transition-colors uppercase"
+                          >归档</button>
                         </>
                       )}
                       <button 
                         onClick={() => handleDelete(agent.id)}
-                        className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-                      ><Trash2 className="w-4 h-4" /></button>
+                        className="text-[10px] font-black text-gray-400 hover:text-red-600 transition-colors uppercase"
+                      >删除</button>
                     </div>
                   </td>
                 </tr>
@@ -372,7 +369,6 @@ const AgentModule: React.FC<Props> = ({ agents, setAgents, numbers, setNumbers, 
           </table>
           {filteredAgents.length === 0 && (
             <div className="py-20 text-center space-y-4">
-               <Users className="w-16 h-16 text-gray-100 mx-auto" />
                <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">未检索到匹配的业务坐席</p>
             </div>
           )}
@@ -391,16 +387,13 @@ const AgentModule: React.FC<Props> = ({ agents, setAgents, numbers, setNumbers, 
             >
               <div className="p-10 border-b flex items-center justify-between bg-gray-50/50">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-[#1A1A1A] text-white rounded-2xl">
-                     <UserPlus className="w-6 h-6" />
-                  </div>
-                  <div>
+                  <div className="bg-white">
                     <h3 className="text-2xl font-black text-gray-900 tracking-tight">{editingAgent ? '坐席资源重构' : '创建业务坐席'}</h3>
                     <p className="text-[10px] text-gray-400 font-bold uppercase mt-1 tracking-widest">{"Base Config > Number pool > Concurrency"}</p>
                   </div>
                 </div>
-                <button onClick={() => setIsModalOpen(false)} className="p-3 bg-white rounded-2xl border shadow-sm hover:scale-110 transition-all text-gray-400 hover:text-gray-900">
-                  <X className="w-6 h-6" />
+                <button onClick={() => setIsModalOpen(false)} className="px-6 py-3 bg-white rounded-2xl border shadow-sm hover:scale-105 transition-all text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                  CLOSE
                 </button>
               </div>
               
@@ -502,7 +495,6 @@ const AgentModule: React.FC<Props> = ({ agents, setAgents, numbers, setNumbers, 
                               formData.selectionMode === 'auto' ? "border-[#0066FF] bg-blue-50/20" : "border-gray-50 hover:border-blue-100"
                             )}
                           >
-                            <Zap className={cn("w-8 h-8 mb-4 transition-all", formData.selectionMode === 'auto' ? "text-[#0066FF] fill-blue-600" : "text-gray-300")} />
                             <h4 className="font-black text-lg text-gray-900 tracking-tight">自动流转分配</h4>
                             <p className="text-[10px] text-gray-400 font-bold mt-1">系统全量扫描线路组内可用号段，自动匹配挂载。</p>
                           </div>
@@ -513,7 +505,6 @@ const AgentModule: React.FC<Props> = ({ agents, setAgents, numbers, setNumbers, 
                               formData.selectionMode === 'manual' ? "border-[#0066FF] bg-blue-50/20" : "border-gray-50 hover:border-blue-100"
                             )}
                           >
-                            <Eye className={cn("w-8 h-8 mb-4 transition-all", formData.selectionMode === 'manual' ? "text-[#0066FF] fill-blue-600" : "text-gray-300")} />
                             <h4 className="font-black text-lg text-gray-900 tracking-tight">人工资源精选</h4>
                             <p className="text-[10px] text-gray-400 font-bold mt-1">手动在资产库中挑选特定流水号段进入坐席池。</p>
                           </div>
@@ -523,10 +514,10 @@ const AgentModule: React.FC<Props> = ({ agents, setAgents, numbers, setNumbers, 
                           <div className="space-y-6">
                             <div className="flex items-center justify-between">
                               <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">号码入库数量</label>
-                              <div className="flex items-center bg-gray-50 p-2 rounded-2xl gap-4">
-                                <button onClick={() => setFormData({...formData, numberCount: Math.max(1, formData.numberCount - 1)})} className="p-2 hover:bg-gray-200 rounded-xl transition-all"><Minus className="w-4 h-4" /></button>
+                              <div className="flex items-center bg-gray-50 px-4 py-2 rounded-2xl gap-8">
+                                <button onClick={() => setFormData({...formData, numberCount: Math.max(1, formData.numberCount - 1)})} className="text-xl font-black text-gray-300 hover:text-gray-900 transition-all">-</button>
                                 <span className="text-xl font-black text-gray-900 tabular-nums w-8 text-center">{formData.numberCount}</span>
-                                <button onClick={() => setFormData({...formData, numberCount: formData.numberCount + 1})} className="p-2 hover:bg-gray-200 rounded-xl transition-all"><Plus className="w-4 h-4" /></button>
+                                <button onClick={() => setFormData({...formData, numberCount: formData.numberCount + 1})} className="text-xl font-black text-gray-300 hover:text-gray-900 transition-all">+</button>
                               </div>
                             </div>
                             <div className="p-6 bg-blue-50/50 rounded-3xl border border-blue-100 border-dashed">

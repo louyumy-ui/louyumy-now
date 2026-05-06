@@ -36,15 +36,14 @@ export const SvgCopyButton: React.FC<SvgCopyButtonProps> = ({
       onClick={handleCopy}
       data-svg-copy-ignore="true"
       className={cn(
-        "flex items-center gap-2 px-3 py-1.5 text-xs font-bold transition-all rounded-lg border cursor-pointer z-50",
+        "flex items-center gap-2 px-6 py-3 text-[10px] font-black transition-all rounded-xl border cursor-pointer z-50 uppercase tracking-widest",
         copied 
           ? "bg-emerald-50 text-emerald-600 border-emerald-200" 
-          : "bg-white text-slate-600 border-slate-200 hover:border-blue-400 hover:text-blue-600 shadow-sm",
+          : "bg-white text-gray-900 border-gray-100 hover:border-gray-900 shadow-sm",
         className
       )}
     >
-      {copied ? <Check size={14} /> : <Copy size={14} />}
-      {copied ? "已复制" : label}
+      {copied ? "COPIED" : label}
     </button>
   );
 };

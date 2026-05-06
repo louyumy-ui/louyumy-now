@@ -238,8 +238,8 @@ const App: React.FC = () => {
               className="bg-white w-full max-w-lg rounded-[40px] shadow-3xl overflow-hidden border border-white/50"
             >
               <div className="p-12 text-center space-y-8">
-                <div className="w-24 h-24 bg-red-50 text-red-500 rounded-[32px] flex items-center justify-center mx-auto shadow-inner">
-                  <AlertTriangle className="w-12 h-12" />
+                <div className="w-24 h-24 bg-red-50 text-red-500 rounded-[32px] flex items-center justify-center mx-auto shadow-inner text-4xl font-black">
+                  !
                 </div>
                 
                 <div className="space-y-3">

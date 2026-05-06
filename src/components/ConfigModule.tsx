@@ -34,10 +34,9 @@ const ConfigModule: React.FC<Props> = ({ config, setConfig }) => {
         </div>
         <button 
           onClick={handleSave}
-          className="flex items-center gap-2 px-8 py-3 bg-[#0066FF] text-white rounded-2xl font-bold hover:bg-[#0052CC] transition-all shadow-xl shadow-[#0066FF]/20"
+          className="flex items-center gap-2 px-8 py-3 bg-[#1A1A1A] text-white rounded-2xl text-sm font-black hover:bg-black transition-all shadow-xl shadow-black/10 uppercase tracking-widest"
         >
-          <Save className="w-5 h-5" />
-          保存配置
+          保存配置方案
         </button>
       </div>
 
@@ -45,18 +44,14 @@ const ConfigModule: React.FC<Props> = ({ config, setConfig }) => {
         {/* Cooling Rules */}
         <div className="bg-white p-8 rounded-3xl border border-[#E5E7EB] shadow-sm space-y-6">
           <div className="flex items-center gap-4 mb-2">
-            <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center">
-              <ShieldCheck className="w-6 h-6" />
-            </div>
-            <h4 className="text-lg font-bold text-[#1A1A1A]">号码冷却规则</h4>
+            <h4 className="text-lg font-black text-[#1A1A1A] uppercase tracking-tight">号码冷却规则</h4>
           </div>
           
           <div className="space-y-4">
             <div className="p-4 bg-orange-50 rounded-2xl border border-orange-100 flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-bold text-orange-800 flex items-center gap-1">
-                  <AlertTriangle className="w-3 h-3" />
-                  拒接监控
+                <span className="text-[10px] font-black text-orange-800 uppercase tracking-widest">
+                  拒接监控模式
                 </span>
                 <div className="flex items-center gap-2">
                   <input 
@@ -79,8 +74,7 @@ const ConfigModule: React.FC<Props> = ({ config, setConfig }) => {
 
             <div className="p-4 bg-orange-50 rounded-2xl border border-orange-100 flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-bold text-orange-800 flex items-center gap-1">
-                  <Cpu className="w-3 h-3" />
+                <span className="text-[10px] font-black text-orange-800 uppercase tracking-widest">
                   短通话监控 (≤{config.coolingRule.shortCallDuration}s)
                 </span>
                 <div className="flex items-center gap-2">
@@ -117,17 +111,13 @@ const ConfigModule: React.FC<Props> = ({ config, setConfig }) => {
         {/* Concurrency Rules */}
         <div className="bg-white p-8 rounded-3xl border border-[#E5E7EB] shadow-sm space-y-6">
           <div className="flex items-center gap-4 mb-2">
-            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#0066FF] flex items-center justify-center">
-              <Zap className="w-6 h-6" />
-            </div>
-            <h4 className="text-lg font-bold text-[#1A1A1A]">并发管控逻辑</h4>
+            <h4 className="text-lg font-black text-[#1A1A1A] uppercase tracking-tight">并发管控逻辑</h4>
           </div>
 
           <div className="space-y-3">
             <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
-              <p className="text-xs font-bold text-[#0066FF] uppercase mb-2 flex items-center gap-1">
-                <Info className="w-3 h-3" />
-                计算公式
+              <p className="text-[10px] font-black text-[#0066FF] uppercase mb-2">
+                计算公式 / SYSTEM LOGIC
               </p>
               <p className="text-xs text-[#0066FF] leading-relaxed opacity-80">
                 实际可用并发 = min(坐席并发, 账号并发, 线路组并发, 全局ASR并发, 网关硬件并发)
@@ -136,8 +126,7 @@ const ConfigModule: React.FC<Props> = ({ config, setConfig }) => {
 
             <div className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-2xl">
               <div className="flex items-center gap-3">
-                <Mic className="w-5 h-5 text-purple-500" />
-                <span className="text-sm font-medium text-[#4B5563]">全局声音克隆池并发</span>
+                <span className="text-sm font-black text-[#4B5563] uppercase tracking-tight">全局声音克隆池并发</span>
               </div>
               <input 
                 type="number" 
@@ -148,8 +137,7 @@ const ConfigModule: React.FC<Props> = ({ config, setConfig }) => {
             </div>
             <div className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-2xl">
               <div className="flex items-center gap-3">
-                <Server className="w-5 h-5 text-gray-500" />
-                <span className="text-sm font-medium text-[#4B5563]">线路组默认CPS上限</span>
+                <span className="text-sm font-black text-[#4B5563] uppercase tracking-tight">线路组默认CPS上限</span>
               </div>
               <span className="text-sm font-bold text-[#1A1A1A]">30 次/秒</span>
             </div>
@@ -159,10 +147,7 @@ const ConfigModule: React.FC<Props> = ({ config, setConfig }) => {
         {/* Forbidden Hours */}
         <div className="bg-white p-8 rounded-3xl border border-[#E5E7EB] shadow-sm space-y-6">
           <div className="flex items-center gap-4 mb-2">
-            <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center">
-              <Clock className="w-6 h-6" />
-            </div>
-            <h4 className="text-lg font-bold text-[#1A1A1A]">禁呼时段设置</h4>
+            <h4 className="text-lg font-black text-[#1A1A1A] uppercase tracking-tight">禁呼时段设置</h4>
           </div>
 
           <div className="flex items-center gap-4">
@@ -185,19 +170,15 @@ const ConfigModule: React.FC<Props> = ({ config, setConfig }) => {
               />
             </div>
           </div>
-          <p className="text-xs text-[#6B7280] flex items-center gap-1">
-            <AlertTriangle className="w-3 h-3 text-orange-500" />
-            禁呼时段内，系统将自动拦截所有外呼请求。
+          <p className="text-[10px] text-orange-600 font-black uppercase tracking-widest leading-relaxed">
+            SYSTEM ALERT: 禁止时段内所有业务请求将被静默拦截以确保合规平衡。
           </p>
         </div>
 
         {/* Auto Replenish */}
         <div className="bg-white p-8 rounded-3xl border border-[#E5E7EB] shadow-sm space-y-6">
           <div className="flex items-center gap-4 mb-2">
-            <div className="w-12 h-12 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center">
-              <RefreshCw className="w-6 h-6" />
-            </div>
-            <h4 className="text-lg font-bold text-[#1A1A1A]">自动补号策略</h4>
+            <h4 className="text-lg font-black text-[#1A1A1A] uppercase tracking-tight">自动补号策略</h4>
           </div>
 
           <div className="space-y-4">
