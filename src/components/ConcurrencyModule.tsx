@@ -13,70 +13,138 @@ const ConcurrencyModule: React.FC = () => {
 
   return (
     <div className="space-y-8 custom-scrollbar overflow-auto h-full pr-4 pb-12">
-      {/* 算力水池业务逻辑重绘 */}
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-           <div className="flex bg-gray-100 p-1 rounded-2xl">
+      {/* 算力水池业务逻辑 - 深度复刻截图 */}
+      <div className="bg-white rounded-[40px] border border-gray-100 shadow-sm p-10 space-y-8">
+        <div className="flex items-center justify-between pb-8 border-b border-gray-50">
+           <div className="flex bg-gray-100 p-1.5 rounded-2xl">
               <button 
                 onClick={() => setActivePool('TTS')}
                 className={cn(
-                  "px-8 py-2.5 rounded-xl text-xs font-black transition-all",
-                  activePool === 'TTS' ? "bg-white text-gray-900 shadow-sm" : "text-gray-400 hover:text-gray-600"
+                  "px-10 py-3 rounded-xl text-xs font-black transition-all uppercase tracking-widest",
+                  activePool === 'TTS' ? "bg-white text-blue-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
                 )}
               >
-                TTS 语音合成
+                TTS (声音复制)
               </button>
               <button 
                 onClick={() => setActivePool('ASR')}
                 className={cn(
-                  "px-8 py-2.5 rounded-xl text-xs font-black transition-all",
-                  activePool === 'ASR' ? "bg-white text-gray-900 shadow-sm" : "text-gray-400 hover:text-gray-600"
+                  "px-10 py-3 rounded-xl text-xs font-black transition-all uppercase tracking-widest",
+                  activePool === 'ASR' ? "bg-white text-blue-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
                 )}
               >
-                ASR 语音识别
+                ASR (语音识别)
               </button>
            </div>
-           <div className="text-[10px] font-black text-blue-600 bg-blue-50 px-4 py-1.5 rounded-full italic">
-              全局算力集群同步中
+           
+           <div className="flex items-center gap-6">
+              <div className="text-[11px] font-black tracking-tight flex items-center gap-4">
+                 <span className="text-gray-400 uppercase">普通话 <span className="text-blue-600">10 路</span></span>
+                 <span className="w-px h-3 bg-gray-200" />
+                 <span className="text-gray-400 uppercase">粤语 <span className="text-blue-600">20 路</span></span>
+              </div>
+              <div className="px-4 py-2 bg-gray-50 rounded-xl text-[9px] font-black text-gray-400 uppercase tracking-widest border border-gray-100">
+                 切片汇总
+              </div>
            </div>
         </div>
 
-        <div className="grid grid-cols-12 gap-6">
-           <div className="col-span-3 bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm space-y-4">
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">全局总采购</p>
-              <p className="text-4xl font-black text-gray-900 tabular-nums">20</p>
-              <div className="pt-4 border-t border-gray-50 flex gap-4 text-[9px] font-black text-gray-400 uppercase">
-                 <span>普通话 10</span>
-                 <span className="w-px h-3 bg-gray-100"></span>
-                 <span>粤语 10</span>
-              </div>
-           </div>
-
-           <div className="col-span-3 bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm space-y-4">
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">固定池-已分配</p>
-              <p className="text-4xl font-black text-blue-600 tabular-nums">4</p>
-              <p className="text-[9px] font-black text-gray-300 leading-relaxed">
-                 固定并发享有绝对优先权，系统将确保资源不可被抢占。
+        {/* 紧急预警 Banner */}
+        <div className="bg-red-50 border border-red-100 rounded-2xl p-6 flex items-center gap-4">
+           <div className="w-8 h-8 bg-red-500 text-white rounded-xl flex items-center justify-center font-black text-xs shadow-lg shadow-red-500/20">!</div>
+           <div>
+              <p className="text-xs font-black text-red-800 leading-none">紧急预警</p>
+              <p className="text-[10px] text-red-600/80 font-black mt-1.5 uppercase tracking-tight">
+                 当前 <span className="text-red-900 underline decoration-red-900/30 underline-offset-4">TTS 普通常话的动态池-预分配总量 (18路)</span> 已经超越动态池容量 (17路)，请注意可能导致抢占拥堵。
               </p>
            </div>
+        </div>
 
-           <div className="col-span-3 bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm space-y-4 text-emerald-600 border-emerald-50">
-              <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">动态池总量</p>
-              <p className="text-4xl font-black tabular-nums">17</p>
-              <div className="pt-4 border-t border-emerald-50/50 flex gap-4 text-[9px] font-black text-emerald-400 uppercase">
-                 <span>普通话 7</span>
-                 <span className="w-px h-3 bg-emerald-50"></span>
-                 <span>粤语 10</span>
+        <div className="grid grid-cols-5 gap-6">
+           {/* Card 1: 采购总量 */}
+           <div className="bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm space-y-6 group hover:shadow-xl transition-all">
+              <div>
+                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">全局总采购</p>
+                 <p className="text-5xl font-black text-gray-900 tabular-nums tracking-tighter">30</p>
+                 <p className="text-[9px] font-black text-red-500 mt-2 uppercase tracking-widest">物理红线</p>
+              </div>
+              <div className="space-y-3 pt-6 border-t border-gray-50">
+                 <div className="flex justify-between text-[9px] font-black text-gray-400 uppercase">
+                    <span className="flex items-center gap-2 font-mono"><div className="w-1.5 h-1.5 bg-gray-200 rounded-full" /> 普通话 10</span>
+                    <span className="flex items-center gap-2 font-mono"><div className="w-1.5 h-1.5 bg-gray-200 rounded-full" /> 粤语 20</span>
+                 </div>
               </div>
            </div>
 
-           <div className="col-span-3 bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm space-y-4">
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">动态池-已分配</p>
-              <p className="text-4xl font-black text-gray-900 tabular-nums">33</p>
-              <div className="flex items-center gap-1.5 text-[9px] font-black text-amber-500 bg-amber-50 px-3 py-1.5 rounded-lg w-fit">
-                 超量溢出预警
+           {/* Card 2: 最短板并发量 - New Bottleneck Metric */}
+           <div className="bg-[#1A1A1A] p-8 rounded-[40px] shadow-2xl space-y-6 group transform hover:-translate-y-1 transition-all">
+              <div>
+                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">模板内最短板</p>
+                 <p className="text-5xl font-black text-white tabular-nums tracking-tighter">12</p>
+                 <p className="text-[9px] font-black text-blue-500 mt-2 uppercase tracking-widest">当前链路瓶颈阈值</p>
+              </div>
+              <div className="pt-6 border-t border-white/10">
+                 <p className="text-[9px] font-black text-gray-500 leading-relaxed uppercase">
+                    由运营商线路 (UNICOM-03) 实时动态CPS反算得出，为当前业务最高可用上限。
+                 </p>
               </div>
            </div>
+
+           {/* Card 3: 动态池总量 */}
+           <div className="bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm space-y-6">
+              <div>
+                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">动态分配池总量</p>
+                 <p className="text-5xl font-black text-gray-900 tabular-nums tracking-tighter">17</p>
+                 <p className="text-[9px] font-black text-gray-300 mt-2 uppercase tracking-widest">动态池可用总量</p>
+              </div>
+              <div className="space-y-3 pt-6 border-t border-gray-50">
+                 <div className="flex justify-between text-[9px] font-black text-gray-400 uppercase font-mono">
+                    <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-gray-200 rounded-full" /> 普通话 7</span>
+                    <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-gray-200 rounded-full" /> 粤语 10</span>
+                 </div>
+              </div>
+           </div>
+
+           {/* Card 4: 预分配占用量 */}
+           <div className="bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm space-y-6 border-amber-100">
+              <div>
+                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">业务预分配占用</p>
+                 <p className="text-5xl font-black text-gray-900 tabular-nums tracking-tighter">33</p>
+                 <p className="text-[9px] font-black text-amber-500 mt-2 uppercase tracking-widest italic">预分配总量 / 动态抢占式</p>
+              </div>
+              <div className="space-y-3 pt-6 border-t border-gray-50">
+                 <div className="flex justify-between text-[9px] font-black text-gray-400 uppercase font-mono">
+                    <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-gray-200 rounded-full" /> 普通话 18</span>
+                    <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-gray-200 rounded-full" /> 粤语 15</span>
+                 </div>
+              </div>
+           </div>
+
+           {/* Card 5: 实时实际占用 */}
+           <div className="bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm space-y-6 border-emerald-100">
+              <div>
+                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">当前通话实际占用</p>
+                 <p className="text-5xl font-black text-emerald-600 tabular-nums tracking-tighter">2</p>
+                 <p className="text-[9px] font-black text-emerald-500 mt-2 uppercase tracking-widest">Real-time Usage</p>
+              </div>
+              <div className="space-y-3 pt-6 border-t border-gray-50">
+                 <div className="flex justify-between text-[9px] font-black text-emerald-600/40 uppercase font-mono">
+                    <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-emerald-200 rounded-full" /> 普通话 1</span>
+                    <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-emerald-200 rounded-full" /> 粤语 1</span>
+                 </div>
+              </div>
+           </div>
+        </div>
+
+        <div className="flex items-center gap-12 pt-6">
+           {['并发购买记录', '并发占用明细', '预警设置'].map((t, i) => (
+             <button key={i} className={cn(
+               "text-[11px] font-black uppercase tracking-widest pb-4 border-b-2 transition-all",
+               i === 0 ? "text-blue-600 border-blue-600" : "text-gray-400 border-transparent hover:text-gray-900"
+             )}>
+                {t}
+             </button>
+           ))}
         </div>
       </div>
 

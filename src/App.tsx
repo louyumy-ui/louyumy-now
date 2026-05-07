@@ -103,12 +103,12 @@ const App: React.FC = () => {
   };
 
   const tabs = [
-    { id: 'dashboard', label: '看板总览', icon: BarChart3 },
-    { id: 'enterprises', label: '企业管理', icon: Briefcase },
-    { id: 'resources', label: '资源管理', icon: Globe },
-    { id: 'agents', label: '坐席管理', icon: Users },
-    { id: 'concurrency', label: '并发管理', icon: Zap },
-    { id: 'config', label: '系统规则配置', icon: Settings },
+    { id: 'dashboard', label: '看板总览' },
+    { id: 'enterprises', label: '企业管理' },
+    { id: 'resources', label: '资源管理' },
+    { id: 'agents', label: '坐席管理' },
+    { id: 'concurrency', label: '并发管理' },
+    { id: 'config', label: '系统规则配置' },
   ];
 
   const renderContent = () => {
@@ -141,29 +141,29 @@ const App: React.FC = () => {
     <div id="figma-export-container" className="w-[1920px] h-[1080px] bg-[#F4F7FE] flex font-sans text-[#1A1A1A] mx-auto overflow-hidden shadow-2xl">
       <Toaster position="top-right" richColors />
       
-      {/* Sidebar */}
+      {/* Sidebar - Icon-free */}
       <motion.aside 
         initial={false}
-        animate={{ width: isSidebarOpen ? 280 : 100 }}
+        animate={{ width: isSidebarOpen ? 280 : 80 }}
         className="bg-white border-r border-[#E5E7EB] flex flex-col h-full z-20 shrink-0 shadow-lg"
       >
         <div className="p-8 mb-4">
-          <div className="flex items-center gap-3 mb-10 overflow-hidden">
+          <div className="flex items-center gap-4 mb-10 overflow-hidden">
             <div className="w-10 h-10 bg-[#0066FF] rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/40">
-              <Zap className="w-6 h-6 text-white fill-white" />
+              <div className="w-4 h-4 bg-white rounded-sm rotate-45" />
             </div>
             {isSidebarOpen && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                <h1 className="text-xl font-black tracking-tight bg-gradient-to-r from-gray-900 to-gray-500 bg-clip-text text-transparent">AI CALL</h1>
+                <h1 className="text-xl font-black tracking-tight text-gray-900 uppercase">AI CALL / 核心</h1>
               </motion.div>
             )}
           </div>
           
           <button 
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="w-full flex items-center justify-center p-3 rounded-2xl bg-gray-50 hover:bg-gray-100 text-[#6B7280] transition-all"
+            className="w-full h-12 flex items-center justify-center rounded-2xl bg-gray-50 hover:bg-gray-100 text-[#6B7280] transition-all text-[10px] font-black uppercase tracking-widest"
           >
-            {isSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {isSidebarOpen ? 'COLLAPSE' : 'MENU'}
           </button>
         </div>
 
@@ -173,17 +173,17 @@ const App: React.FC = () => {
                key={tab.id}
                onClick={() => setActiveTab(tab.id as any)}
                className={cn(
-                 "w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-300 relative group",
+                 "w-full flex items-center px-6 py-5 rounded-2xl transition-all duration-300 relative group",
                  activeTab === tab.id 
-                   ? "bg-[#1A1A1A] text-white shadow-xl shadow-black/10 font-bold" 
+                   ? "bg-[#1A1A1A] text-white shadow-xl shadow-black/10" 
                    : "text-[#A3AED0] hover:bg-gray-50 hover:text-gray-900"
                )}
              >
-               <tab.icon className={cn("w-5 h-5", activeTab === tab.id ? "text-white" : "text-[#A3AED0] group-hover:text-gray-900")} />
-               {isSidebarOpen && <span className="text-sm tracking-tight">{tab.label}</span>}
-               {activeTab === tab.id && (
+               {isSidebarOpen && <span className="text-xs font-black uppercase tracking-widest leading-none">{tab.label}</span>}
+               {activeTab === tab.id && isSidebarOpen && (
                  <motion.div layoutId="active-indicator" className="ml-auto w-1.5 h-6 bg-[#0066FF] rounded-full" />
                )}
+               {!isSidebarOpen && <span className="text-[10px] font-black mx-auto">{tab.label.slice(0, 2)}</span>}
              </button>
           ))}
         </nav>
@@ -191,16 +191,20 @@ const App: React.FC = () => {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative">
-        <header className="h-24 flex items-center justify-between px-12 z-10 shrink-0">
+        <header className="h-24 flex items-center justify-between px-12 z-10 shrink-0 bg-white">
           <div className="flex flex-col">
-            <h2 className="text-3xl font-black text-[#1A1A1A] tracking-tight">
+            <h2 className="text-3xl font-black text-[#1A1A1A] uppercase tracking-tighter">
               {tabs.find(t => t.id === activeTab)?.label}
             </h2>
           </div>
           
-          <div className="flex items-center gap-6">
-            <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-              Production Environment / Standard Mode
+          <div className="flex items-center gap-8">
+            <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+              INSTANCE: CLUSTER-NODE-01 / MASTER
+            </div>
+            <div className="w-px h-6 bg-gray-100" />
+            <div className="flex items-center gap-4">
+               <div className="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center text-white text-[10px] font-black uppercase">ADMIN</div>
             </div>
           </div>
         </header>
