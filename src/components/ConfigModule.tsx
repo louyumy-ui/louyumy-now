@@ -1,222 +1,110 @@
-import React from 'react';
-import { 
-  ShieldCheck, 
-  Zap, 
-  Clock, 
-  RefreshCw, 
-  Save, 
-  AlertTriangle,
-  Info,
-  Mic,
-  Cpu,
-  Server
-} from 'lucide-react';
-import { GlobalConfig } from '../types';
+import React, { useState } from 'react';
+import { cn } from '../lib/utils';
 
-interface Props {
-  config: GlobalConfig;
-  setConfig: React.Dispatch<React.SetStateAction<GlobalConfig>>;
-}
-
-const ConfigModule: React.FC<Props> = ({ config, setConfig }) => {
-  const handleSave = () => {
-    // In a real app, this would be an API call
-    console.log('Saving config:', config);
-  };
+const ConfigModule: React.FC = () => {
+  const [coolingHours, setCoolingHours] = useState(24);
+  const [rejectLimit, setRejectLimit] = useState(5);
+  const [timeRange, setTimeRange] = useState({ start: '09:00', end: '18:00' });
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="space-y-10">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h3 className="text-2xl font-bold text-[#1A1A1A]">全局策略配置</h3>
-          <p className="text-[#6B7280] text-sm mt-1">管理系统核心外呼规则、并发管控及合规性设置</p>
+          <h3 className="text-[28px] font-[900] text-black tracking-tighter leading-none uppercase">核心业务策略集群</h3>
+          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] mt-3 underline decoration-gray-200 decoration-2 underline-offset-4">Global Security & Compliance Framework</p>
         </div>
         <button 
-          onClick={handleSave}
-          className="flex items-center gap-2 px-8 py-3 bg-[#1A1A1A] text-white rounded-2xl text-sm font-black hover:bg-black transition-all shadow-xl shadow-black/10 uppercase tracking-widest"
+          className="px-10 py-5 bg-black text-white rounded-[24px] text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-black/20 hover:scale-105 active:scale-95 transition-all"
         >
-          保存配置方案
+          保存当前下发方案
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Cooling Rules */}
-        <div className="bg-white p-8 rounded-3xl border border-[#E5E7EB] shadow-sm space-y-6">
-          <div className="flex items-center gap-4 mb-2">
-            <h4 className="text-lg font-black text-[#1A1A1A] uppercase tracking-tight">号码冷却规则</h4>
+      <div className="grid grid-cols-2 gap-10">
+        {/* 号码冷却与隔离 */}
+        <div className="bg-white p-12 rounded-[48px] border-[1.33px] border-gray-100 shadow-sm space-y-10">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-[900] text-black uppercase tracking-[0.2em]">号码冷却隔离规则</h4>
+            <div className="w-2 h-2 rounded-full bg-blue-600" />
           </div>
-          
-          <div className="space-y-4">
-            <div className="p-4 bg-orange-50 rounded-2xl border border-orange-100 flex flex-col gap-2">
+
+          <div className="space-y-6">
+            <div className="p-8 bg-gray-50 rounded-[32px] border border-gray-100 space-y-6">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black text-orange-800 uppercase tracking-widest">
-                  拒接监控模式
-                </span>
-                <div className="flex items-center gap-2">
-                  <input 
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">触发阈值 / TRIGGER</span>
+                <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase">DYNAMIC</span>
+              </div>
+              <div className="flex items-center gap-6">
+                <div className="flex-1 space-y-2">
+                   <p className="text-[9px] font-black text-gray-900 uppercase">累计拒接限额</p>
+                   <input 
                     type="number" 
-                    value={config.coolingRule.rejectionWindow}
-                    onChange={(e) => setConfig(prev => ({ ...prev, coolingRule: { ...prev.coolingRule, rejectionWindow: parseInt(e.target.value) } }))}
-                    className="w-14 px-2 py-1 bg-white border border-orange-200 rounded-lg text-center text-xs font-bold"
-                  />
-                  <span className="text-xs text-orange-700">小时内，累计超过</span>
-                  <input 
+                    value={rejectLimit}
+                    onChange={(e) => setRejectLimit(parseInt(e.target.value))}
+                    className="w-full bg-white border border-gray-100 p-4 rounded-2xl text-lg font-black"
+                   />
+                </div>
+                <div className="flex-1 space-y-2">
+                   <p className="text-[9px] font-black text-gray-900 uppercase">冷却隔离时长</p>
+                   <input 
                     type="number" 
-                    value={config.coolingRule.rejectionLimit}
-                    onChange={(e) => setConfig(prev => ({ ...prev, coolingRule: { ...prev.coolingRule, rejectionLimit: parseInt(e.target.value) } }))}
-                    className="w-14 px-2 py-1 bg-white border border-orange-200 rounded-lg text-center text-xs font-bold"
-                  />
-                  <span className="text-xs text-orange-700">次</span>
+                    value={coolingHours}
+                    onChange={(e) => setCoolingHours(parseInt(e.target.value))}
+                    className="w-full bg-white border border-gray-100 p-4 rounded-2xl text-lg font-black"
+                   />
                 </div>
               </div>
             </div>
 
-            <div className="p-4 bg-orange-50 rounded-2xl border border-orange-100 flex flex-col gap-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black text-orange-800 uppercase tracking-widest">
-                  短通话监控 (≤{config.coolingRule.shortCallDuration}s)
-                </span>
-                <div className="flex items-center gap-2">
+            <div className="p-8 bg-white border-[1.33px] border-gray-100 rounded-[32px] flex items-center justify-between">
+               <div>
+                  <p className="text-[10px] font-black text-black uppercase tracking-widest">自动负载补号开关</p>
+                  <p className="text-[9px] text-gray-400 font-bold mt-1">触发冷却后系统自动从公共池调度补齐</p>
+               </div>
+               <div className="w-16 h-8 bg-black rounded-full p-1 flex items-center cursor-pointer">
+                  <div className="w-6 h-6 bg-white rounded-full ml-auto shadow-sm" />
+               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 全局合规管控 */}
+        <div className="bg-white p-12 rounded-[48px] border-[1.33px] border-gray-100 shadow-sm space-y-10">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-[900] text-black uppercase tracking-[0.2em]">全局合规时间管控</h4>
+            <div className="w-2 h-2 rounded-full bg-black" />
+          </div>
+
+          <div className="space-y-8">
+            <div className="grid grid-cols-2 gap-8">
+               <div className="space-y-3">
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">业务启始时间</p>
                   <input 
-                    type="number" 
-                    value={config.coolingRule.shortCallWindow}
-                    onChange={(e) => setConfig(prev => ({ ...prev, coolingRule: { ...prev.coolingRule, shortCallWindow: parseInt(e.target.value) } }))}
-                    className="w-14 px-2 py-1 bg-white border border-orange-200 rounded-lg text-center text-xs font-bold"
+                    type="time" 
+                    value={timeRange.start}
+                    onChange={(e) => setTimeRange({ ...timeRange, start: e.target.value })}
+                    className="w-full bg-gray-50 border-none p-6 rounded-[32px] text-2xl font-[900]"
                   />
-                  <span className="text-xs text-orange-700">小时内，累计超过</span>
+               </div>
+               <div className="space-y-3">
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">强制熔断时间</p>
                   <input 
-                    type="number" 
-                    value={config.coolingRule.shortCallCountLimit}
-                    onChange={(e) => setConfig(prev => ({ ...prev, coolingRule: { ...prev.coolingRule, shortCallCountLimit: parseInt(e.target.value) } }))}
-                    className="w-14 px-2 py-1 bg-white border border-orange-200 rounded-lg text-center text-xs font-bold"
+                    type="time" 
+                    value={timeRange.end}
+                    onChange={(e) => setTimeRange({ ...timeRange, end: e.target.value })}
+                    className="w-full bg-gray-50 border-none p-6 rounded-[32px] text-2xl font-[900]"
                   />
-                  <span className="text-xs text-orange-700">通</span>
-                </div>
-              </div>
+               </div>
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-2xl">
-              <span className="text-sm font-medium text-[#4B5563]">冷却时长 (小时)</span>
-              <input 
-                type="number" 
-                value={config.coolingRule.coolingHours}
-                onChange={(e) => setConfig(prev => ({ ...prev, coolingRule: { ...prev.coolingRule, coolingHours: parseInt(e.target.value) } }))}
-                className="w-20 px-3 py-1.5 bg-white border border-[#E5E7EB] rounded-lg text-center font-bold focus:ring-2 focus:ring-[#0066FF]/20"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Concurrency Rules */}
-        <div className="bg-white p-8 rounded-3xl border border-[#E5E7EB] shadow-sm space-y-6">
-          <div className="flex items-center gap-4 mb-2">
-            <h4 className="text-lg font-black text-[#1A1A1A] uppercase tracking-tight">并发管控逻辑</h4>
-          </div>
-
-          <div className="space-y-3">
-            <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
-              <p className="text-[10px] font-black text-[#0066FF] uppercase mb-2">
-                计算公式 / SYSTEM LOGIC
-              </p>
-              <p className="text-xs text-[#0066FF] leading-relaxed opacity-80">
-                实际可用并发 = min(坐席并发, 账号并发, 线路组并发, 全局ASR并发, 网关硬件并发)
-              </p>
-            </div>
-
-            <div className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-2xl">
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-black text-[#4B5563] uppercase tracking-tight">全局声音克隆池并发</span>
-              </div>
-              <input 
-                type="number" 
-                value={config.concurrencyRule.maxGlobalVoiceCloneConcurrency}
-                onChange={(e) => setConfig(prev => ({ ...prev, concurrencyRule: { ...prev.concurrencyRule, maxGlobalVoiceCloneConcurrency: parseInt(e.target.value) } }))}
-                className="w-20 px-3 py-1.5 bg-white border border-[#E5E7EB] rounded-lg text-center font-bold focus:ring-2 focus:ring-[#0066FF]/20"
-              />
-            </div>
-            <div className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-2xl">
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-black text-[#4B5563] uppercase tracking-tight">线路组默认CPS上限</span>
-              </div>
-              <span className="text-sm font-bold text-[#1A1A1A]">30 次/秒</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Forbidden Hours */}
-        <div className="bg-white p-8 rounded-3xl border border-[#E5E7EB] shadow-sm space-y-6">
-          <div className="flex items-center gap-4 mb-2">
-            <h4 className="text-lg font-black text-[#1A1A1A] uppercase tracking-tight">禁呼时段设置</h4>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="flex-1 space-y-2">
-              <label className="text-xs font-bold text-[#6B7280]">开始时间</label>
-              <input 
-                type="time" 
-                value={config.forbiddenHours.start}
-                onChange={(e) => setConfig(prev => ({ ...prev, forbiddenHours: { ...prev.forbiddenHours, start: e.target.value } }))}
-                className="w-full px-4 py-2.5 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl focus:ring-2 focus:ring-[#0066FF]/20"
-              />
-            </div>
-            <div className="flex-1 space-y-2">
-              <label className="text-xs font-bold text-[#6B7280]">结束时间</label>
-              <input 
-                type="time" 
-                value={config.forbiddenHours.end}
-                onChange={(e) => setConfig(prev => ({ ...prev, forbiddenHours: { ...prev.forbiddenHours, end: e.target.value } }))}
-                className="w-full px-4 py-2.5 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl focus:ring-2 focus:ring-[#0066FF]/20"
-              />
-            </div>
-          </div>
-          <p className="text-[10px] text-orange-600 font-black uppercase tracking-widest leading-relaxed">
-            SYSTEM ALERT: 禁止时段内所有业务请求将被静默拦截以确保合规平衡。
-          </p>
-        </div>
-
-        {/* Auto Replenish */}
-        <div className="bg-white p-8 rounded-3xl border border-[#E5E7EB] shadow-sm space-y-6">
-          <div className="flex items-center gap-4 mb-2">
-            <h4 className="text-lg font-black text-[#1A1A1A] uppercase tracking-tight">自动补号策略</h4>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-2xl">
-              <div className="flex flex-col">
-                <span className="text-sm font-bold text-[#1A1A1A]">冷却自动补号</span>
-                <span className="text-[10px] text-[#6B7280]">号码进入冷却时，自动从空闲池补齐</span>
-              </div>
-              <button 
-                onClick={() => setConfig(prev => ({ ...prev, autoReplenishCooling: !prev.autoReplenishCooling }))}
-                className={`w-12 h-6 rounded-full transition-all relative ${config.autoReplenishCooling ? 'bg-[#0066FF]' : 'bg-gray-300'}`}
-              >
-                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${config.autoReplenishCooling ? 'left-7' : 'left-1'}`}></div>
-              </button>
-            </div>
-            <div className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-2xl">
-              <div className="flex flex-col">
-                <span className="text-sm font-bold text-[#1A1A1A]">停用自动补号</span>
-                <span className="text-[10px] text-[#6B7280]">号码被停用时，自动从空闲池补齐</span>
-              </div>
-              <button 
-                onClick={() => setConfig(prev => ({ ...prev, autoReplenishDisabled: !prev.autoReplenishDisabled }))}
-                className={`w-12 h-6 rounded-full transition-all relative ${config.autoReplenishDisabled ? 'bg-[#0066FF]' : 'bg-gray-300'}`}
-              >
-                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${config.autoReplenishDisabled ? 'left-7' : 'left-1'}`}></div>
-              </button>
-            </div>
-            <div className="flex items-center justify-between p-4 bg-red-50 rounded-2xl border border-red-100">
-              <div className="flex flex-col">
-                <span className="text-sm font-bold text-red-800">24小时自动补号上限 (次)</span>
-                <span className="text-[10px] text-red-600 font-medium">每坐席/业务线今日补号次数红线</span>
-              </div>
-              <input 
-                type="number" 
-                value={config.replenishLimit24h}
-                onChange={(e) => setConfig(prev => ({ ...prev, replenishLimit24h: parseInt(e.target.value) || 0 }))}
-                className="w-20 px-3 py-1.5 bg-white border border-red-200 rounded-lg text-center font-bold text-red-800"
-              />
+            <div className="p-10 bg-[#1A1A1A] rounded-[40px] text-white space-y-6">
+               <p className="text-[10px] font-black text-blue-400 uppercase tracking-[0.3em]">系统风险隔离提示</p>
+               <p className="text-xs leading-relaxed font-bold opacity-80">
+                  当前处于 [高敏感] 行业准入模式下，所有策略修改将实时同步至 24 个边缘网关节点，预计全球生效时间为 450ms。
+               </p>
+               <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-full bg-blue-600 w-2/3" />
+               </div>
             </div>
           </div>
         </div>
